@@ -2,9 +2,10 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 1 (Architecture & Planning) complete. Implementation has not started.**
-> This repository currently contains architecture documentation, engineering standards, and
-> Claude Code workflow assets only. No application code exists yet.
+> **Status: Phase 2 (Repository & Development Foundation) complete.**
+> The monorepo, tooling, CI, and app skeletons exist and boot. No product features yet —
+> `apps/web` serves a placeholder page and `apps/api` exposes only `/health` and `/ready`.
+> Feature work begins in Phase 3 (database & domain layer).
 
 ## Overview
 
@@ -72,19 +73,21 @@ docs/
 
 ## Local development
 
-> Not yet available. Established in **Phase 2 — Repository & Development Foundation**, whose
-> top priority is a frictionless setup (hosting is deferred — see `docs/decisions/OPEN-QUESTIONS.md` Q4).
-> Target developer experience:
->
-> ```
-> cp .env.example .env        # fill in Google + Anthropic keys
-> pnpm install
-> pnpm db:up                  # docker compose: Postgres
-> pnpm db:migrate             # prisma migrate
-> pnpm dev                    # turborepo: apps/web + apps/api together
-> ```
->
-> One command set, no global installs beyond Node + pnpm + Docker.
+Prerequisites: Node 22 (`.nvmrc`), pnpm 10, Docker. Nothing else global.
+
+```bash
+cp .env.example .env     # fill in ANTHROPIC_API_KEY; Google keys come in Phase 4
+pnpm install
+pnpm db:up               # docker compose: Postgres 16 on :5432
+pnpm dev                 # turborepo: web (:3000) + api (:4000) together
+```
+
+- `pnpm dev` — run both apps
+- `pnpm build` / `pnpm lint` / `pnpm typecheck` / `pnpm test` — run across the workspace via Turborepo
+- `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` — local Postgres
+- `pnpm format` — Prettier
+
+`pnpm db:migrate` (Prisma) arrives in Phase 3. API health check: `curl localhost:4000/health`.
 
 ## Environment configuration
 
@@ -128,8 +131,11 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phase 1 complete; all open decisions resolved (`docs/decisions/OPEN-QUESTIONS.md`, 2026-09-01).
-Awaiting approval to begin Phase 2.
+Phase 2 complete: pnpm + Turborepo monorepo, `apps/web` (Next.js 15 / React 19 / Tailwind v4
+/ shadcn wired), `apps/api` (NestJS 11 + HealthModule), `packages/shared` + `packages/config`,
+ESLint/Prettier/tsconfig presets, Docker Compose Postgres, GitHub Actions CI. `pnpm dev` boots
+both apps. All Phase-1 decisions resolved (`docs/decisions/OPEN-QUESTIONS.md`).
+Next: **Phase 3 — Database & Domain Layer**.
 
 ## Future roadmap
 

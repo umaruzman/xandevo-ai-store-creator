@@ -14,13 +14,18 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 1 — Architecture & Planning. COMPLETE.**
-Implementation has **not** started. Do not write product code until the user approves Phase 2.
+**Phase 2 — Repository & Development Foundation. COMPLETE.** Next: **Phase 3 — Database &
+Domain Layer** (Prisma schema per ADR-006, Store Definition Zod schema v1 in
+`packages/shared`, domain validators/normalizers/sanitizer + mapper, all with tests).
 
-Prohibited until later phases: landing page, authentication, Google OAuth, AI generation
-pipeline, store editor, live preview, production API endpoints, database application logic.
+What exists now: pnpm+Turborepo monorepo; `apps/web` (Next 15 / React 19 / Tailwind v4 /
+shadcn wired, placeholder page); `apps/api` (NestJS 11, only `HealthModule`);
+`packages/shared` (stub) + `packages/config` (eslint/tsconfig/prettier presets);
+Docker Compose Postgres; GitHub Actions CI running `turbo run typecheck lint test build`.
 
-See `docs/development/roadmap.md` for all phases and their gates.
+Still prohibited until their phase: landing page, authentication, Google OAuth, AI
+generation pipeline, store editor, live preview, production API endpoints beyond health,
+database application logic. See `docs/development/roadmap.md`.
 
 ## Technology stack
 

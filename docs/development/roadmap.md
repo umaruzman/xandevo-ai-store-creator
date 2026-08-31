@@ -9,7 +9,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 
 ---
 
-## Phase 1 — Architecture & Planning  ✅ (this phase)
+## Phase 1 — Architecture & Planning  ✅ COMPLETE
 
 - **Objective:** establish architecture, standards, docs, and the Claude Code workflow.
 - **Scope:** all `docs/`, `CLAUDE.md`, `README.md`, `.claude/skills/`.
@@ -21,7 +21,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 - **Gate:** every Section-29 doc exists with real content; ADRs for genuine decisions;
   skills created; open questions listed; user approves.
 
-## Phase 2 — Repository & Development Foundation
+## Phase 2 — Repository & Development Foundation  ✅ COMPLETE (2026-09-01)
 
 - **Objective:** scaffold the monorepo and tooling, with a **frictionless one-command dev
   setup** as the priority (hosting is deferred — Q4).
