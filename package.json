@@ -1,0 +1,37 @@
+{
+  "name": "xandevo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Xandevo — AI Store Builder by Umar Uzman",
+  "packageManager": "pnpm@10.30.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,css}\"",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres"
+  },
+  "devDependencies": {
+    "@xandevo/config": "workspace:*",
+    "prettier": "3.4.2",
+    "prettier-plugin-tailwindcss": "0.6.9",
+    "turbo": "2.3.3",
+    "typescript": "5.7.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}
