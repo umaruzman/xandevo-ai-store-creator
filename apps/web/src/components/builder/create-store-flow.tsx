@@ -10,8 +10,7 @@ import { StoreEditor } from './store-editor';
 
 /**
  * Owns the create-store flow: prompt form -> Server Action -> builder store ->
- * generated summary. Single route, two states — no navigation, no persistence
- * (renderer/editor/save land in Phases 7–9).
+ * editor/preview. Saving (Phase 9) navigates to `/stores/[id]`.
  */
 export function CreateStoreFlow() {
   const [state, formAction, isPending] = useActionState(generateStoreAction, null);
@@ -24,8 +23,15 @@ export function CreateStoreFlow() {
 
   useEffect(() => {
     if (!state) return;
-    if (state.ok) setGenerated(state.data);
-    else setGenerationError(state.error);
+    if (state.ok) {
+      setGenerated({
+        definition: state.data.definition,
+        promptVersion: state.data.promptVersion,
+        prompt: state.prompt,
+      });
+    } else {
+      setGenerationError(state.error);
+    }
   }, [state, setGenerated, setGenerationError]);
 
   if (hasDefinition) return <StoreEditor onStartOver={reset} />;

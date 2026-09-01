@@ -6,7 +6,7 @@ import { ApiError } from '@/lib/api';
 import { apiClient } from '@/lib/api-client';
 
 export type GenerateResult =
-  | { ok: true; data: GenerateStoreResponse }
+  | { ok: true; data: GenerateStoreResponse; prompt: string }
   | { ok: false; error: string };
 
 /** `useActionState` action: prompt -> generated Store Definition, or a friendly error. */
@@ -24,7 +24,7 @@ export async function generateStoreAction(
 
   try {
     const data = await apiClient.generateStore(prompt);
-    return { ok: true, data };
+    return { ok: true, data, prompt };
   } catch (err) {
     if (err instanceof ApiError) return { ok: false, error: friendly(err) };
     return { ok: false, error: 'Something went wrong. Please try again.' };

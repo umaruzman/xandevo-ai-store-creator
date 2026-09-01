@@ -9,6 +9,7 @@ export type GenerationStatus = 'idle' | 'pending' | 'success' | 'error';
 export interface GeneratedPayload {
   definition: StoreDefinition;
   promptVersion: string;
+  prompt: string;
 }
 
 export interface SavedStore {
@@ -25,6 +26,8 @@ export interface FieldResult {
 interface BuilderState {
   storeId: string | null;
   promptVersion: string | null;
+  /** The original NL prompt — needed by `POST /stores` when first saving. */
+  promptText: string | null;
   /** The single working copy of the editable definition (ADR-007). */
   definition: StoreDefinition | null;
   /** Hash of the last persisted definition; `null` = never saved. */
@@ -54,6 +57,7 @@ interface BuilderState {
 const initial = {
   storeId: null,
   promptVersion: null,
+  promptText: null,
   definition: null,
   savedHash: null,
   generation: { status: 'idle' as GenerationStatus },
@@ -65,10 +69,11 @@ export const builderStateCreator: StateCreator<BuilderState> = (set, get) => ({
 
   startGeneration: () => set({ generation: { status: 'pending' } }),
 
-  setGenerated: ({ definition, promptVersion }) =>
+  setGenerated: ({ definition, promptVersion, prompt }) =>
     set({
       definition,
       promptVersion,
+      promptText: prompt,
       storeId: null,
       // Baseline for dirty tracking = the generated definition; an edit makes it dirty.
       savedHash: hashValue(definition),

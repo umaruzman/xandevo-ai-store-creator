@@ -27,7 +27,9 @@ describe('useBuilderStore', () => {
   });
 
   it('setGenerated stores the definition, marks success, and starts clean (baseline set)', () => {
-    useBuilderStore.getState().setGenerated({ definition: def(), promptVersion: 'store@v1' });
+    useBuilderStore
+      .getState()
+      .setGenerated({ definition: def(), promptVersion: 'store@v1', prompt: 'p' });
     const s = useBuilderStore.getState();
     expect(s.generation.status).toBe('success');
     expect(s.definition?.meta.name).toBe('Maison Oud');
@@ -56,7 +58,9 @@ describe('useBuilderStore', () => {
   });
 
   it('markSaved clears the dirty flag for the current definition', () => {
-    useBuilderStore.getState().setGenerated({ definition: def(), promptVersion: 'store@v1' });
+    useBuilderStore
+      .getState()
+      .setGenerated({ definition: def(), promptVersion: 'store@v1', prompt: 'p' });
     const current = useBuilderStore.getState().definition!;
     useBuilderStore
       .getState()
@@ -66,7 +70,9 @@ describe('useBuilderStore', () => {
 
   describe('updateField', () => {
     beforeEach(() =>
-      useBuilderStore.getState().setGenerated({ definition: def(), promptVersion: 'store@v1' }),
+      useBuilderStore
+        .getState()
+        .setGenerated({ definition: def(), promptVersion: 'store@v1', prompt: 'p' }),
     );
 
     it('commits a valid edit, marks dirty, and touches nothing but `definition`', () => {
@@ -135,7 +141,9 @@ describe('useBuilderStore', () => {
   });
 
   it('reset returns to the initial state', () => {
-    useBuilderStore.getState().setGenerated({ definition: def(), promptVersion: 'store@v1' });
+    useBuilderStore
+      .getState()
+      .setGenerated({ definition: def(), promptVersion: 'store@v1', prompt: 'p' });
     useBuilderStore.getState().reset();
     const s = useBuilderStore.getState();
     expect(s.definition).toBeNull();

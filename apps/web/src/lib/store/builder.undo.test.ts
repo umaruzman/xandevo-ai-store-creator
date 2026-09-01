@@ -24,7 +24,7 @@ describe('builder store is undo-ready (zundo spike)', () => {
     const def = buildStoreDefinition(validStoreDefinitionInput(), {
       idFactory: sequentialIdFactory(),
     });
-    store.getState().setGenerated({ definition: def, promptVersion: 'store@v1' });
+    store.getState().setGenerated({ definition: def, promptVersion: 'store@v1', prompt: 'p' });
     store.getState().updateField(['meta', 'name'], 'Edited');
     expect(store.getState().definition?.meta.name).toBe('Edited');
 

@@ -3,7 +3,8 @@ import {
   sequentialIdFactory,
   validStoreDefinitionInput,
 } from '@xandevo/shared';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders as render } from '@/test/render';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -31,6 +32,7 @@ describe('CreateStoreFlow', () => {
     generateStoreAction.mockResolvedValue({
       ok: true,
       data: { definition, promptVersion: 'store@v1', usage: { inputTokens: 0, outputTokens: 0 } },
+      prompt: 'a store',
     });
 
     render(<CreateStoreFlow />);
@@ -72,6 +74,7 @@ describe('CreateStoreFlow', () => {
     generateStoreAction.mockResolvedValue({
       ok: true,
       data: { definition, promptVersion: 'store@v1', usage: { inputTokens: 0, outputTokens: 0 } },
+      prompt: 'a store',
     });
     render(<CreateStoreFlow />);
     await userEvent.type(screen.getByLabelText('Describe your store'), 'a tech gadget store');

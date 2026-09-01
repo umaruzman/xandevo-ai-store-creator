@@ -1,12 +1,20 @@
 import 'server-only';
 
-import type { GenerateStoreResponse, MeResponse } from '@xandevo/shared';
+import type {
+  CreateStoreRequest,
+  GenerateStoreResponse,
+  MeResponse,
+  StoreListResponse,
+  StoreResponse,
+  UpdateStoreRequest,
+} from '@xandevo/shared';
 
 import { apiFetch } from './api';
 
 /**
- * Typed server-side calls to the Nest API. Consumed from Server Components and
- * Server Actions only (depends on the server-only `apiFetch`).
+ * Typed server-side calls to the Nest API. Consumed from Server Components,
+ * Server Actions, and the BFF route handlers under `app/api/*` (all depend on
+ * the server-only `apiFetch`, which mints the short-lived API JWT).
  */
 export const apiClient = {
   me: () => apiFetch<MeResponse>('/me'),
@@ -17,5 +25,15 @@ export const apiClient = {
       body: JSON.stringify({ prompt }),
     }),
 
-  // listStores / getStore / createStore / updateStore — Phase 9.
+  listStores: (query = '') => apiFetch<StoreListResponse>(`/stores${query}`),
+
+  getStore: (id: string) => apiFetch<StoreResponse>(`/stores/${id}`),
+
+  createStore: (body: CreateStoreRequest) =>
+    apiFetch<StoreResponse>('/stores', { method: 'POST', body: JSON.stringify(body) }),
+
+  updateStore: (id: string, body: UpdateStoreRequest) =>
+    apiFetch<StoreResponse>(`/stores/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
+  deleteStore: (id: string) => apiFetch<null>(`/stores/${id}`, { method: 'DELETE' }),
 };

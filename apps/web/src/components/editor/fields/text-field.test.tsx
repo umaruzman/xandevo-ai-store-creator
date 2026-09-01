@@ -17,6 +17,7 @@ const seed = () =>
       idFactory: sequentialIdFactory(),
     }),
     promptVersion: 'store@v1',
+    prompt: 'p',
   });
 
 describe('TextField', () => {
