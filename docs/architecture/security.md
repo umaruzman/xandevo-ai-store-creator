@@ -4,17 +4,23 @@ Practical rules every implementation phase must follow. Treat all external input
 bodies, query params, JWT claims, **AI output**, and the user's prompt — as hostile until
 validated.
 
-## 1. Authentication
+## 1. Authentication  *(implemented — Phase 4)*
 
-- Google OAuth via Auth.js in `apps/web`. Session stored in an httpOnly, Secure, SameSite=Lax
-  cookie owned by the web app.
-- For API calls, the web app presents a short-lived JWT (see ADR-005) in
-  `Authorization: Bearer`. The API verifies signature, `exp`, `iss`, `aud` on every request
-  via `JwtAuthGuard`. No session cookies on the API.
-- User provisioning: on first successful login, upsert a `User` by Google `sub`. `sub` is the
-  stable identity; email may change.
-- Logout: web clears the session cookie; JWTs are short-lived (≤15 min) so no server
-  revocation list is needed for MVP. Refresh handled by Auth.js session.
+- Google OAuth via Auth.js (NextAuth v5) in `apps/web`, `session.strategy = 'jwt'`, no DB
+  adapter. Session in an httpOnly, Secure, SameSite=Lax cookie owned by the web app.
+- For API calls the web app mints a **dedicated** short-lived JWT (not the session token) —
+  `mintApiToken` (`jose`, HS256, `AUTH_JWT_SECRET`, 15 min), claims per
+  `@xandevo/shared/auth`. Attached as `Authorization: Bearer` by `apiFetch` (server-only).
+- The API's global `JwtAuthGuard` (`APP_GUARD`) verifies signature, `exp`, `iss`
+  (`xandevo-web`), `aud` (`xandevo-api`) on every request. Secure by default; only
+  `@Public()` routes (health) skip it. No session cookies on the API; CORS stays off (web
+  calls the API server-side).
+- Provisioning: `JwtStrategy.validate` → `UsersService.upsertFromClaims`, keyed by Google
+  `sub` (stable); email / name / avatar re-synced each request.
+- `AUTH_JWT_SECRET` is shared by both apps and must be ≥16 chars; both refuse to
+  start/mint otherwise.
+- Logout: web clears the session cookie; the 15-min TTL bounds API access, so no server
+  revocation list for MVP.
 
 ## 2. Authorization & tenant isolation
 

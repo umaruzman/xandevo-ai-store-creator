@@ -1,7 +1,24 @@
 # ADR-005 — Authentication Strategy
 
-- **Status:** Accepted (Phase 1; resolved 2026-09-01, option A)
+- **Status:** Accepted (Phase 1; resolved 2026-09-01, option A). **Implemented in Phase 4.**
 - **Date:** 2026-08-31
+
+## Implementation (Phase 4)
+
+- Contract in `@xandevo/shared/auth`: `API_JWT_ISSUER` (`xandevo-web`),
+  `API_JWT_AUDIENCE` (`xandevo-api`), `API_JWT_ALGORITHM` (`HS256`),
+  `API_JWT_TTL_SECONDS` (900), `ApiJwtClaims` — imported by both apps so they can't drift.
+- **`apps/web`:** Auth.js (NextAuth v5) Google provider, `session.strategy = 'jwt'`, no DB
+  adapter (`lib/auth.ts`). `lib/api-token.ts#mintApiToken` signs the dedicated API JWT with
+  `AUTH_JWT_SECRET` (`jose`, server-only). `lib/api.ts#apiFetch` attaches it to server-side
+  API calls. `middleware.ts` gates `/dashboard/:path*`.
+- **`apps/api`:** `AuthModule` registers a global `APP_GUARD` `JwtAuthGuard` (secure by
+  default; `@Public()` opts health out) + `JwtStrategy` (`passport-jwt`, verifies signature
+  / `iss` / `aud` / `exp`). `JwtStrategy.validate` calls `UsersService.upsertFromClaims`
+  (first-login provisioning keyed by Google `sub`). `@CurrentUser()` exposes the row.
+  `UsersController` serves `GET /me`.
+- No session revocation list — the 15-minute TTL bounds exposure; the web app re-mints from
+  the live Auth.js session.
 
 ## Context
 

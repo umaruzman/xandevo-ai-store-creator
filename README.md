@@ -2,12 +2,12 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 3 (Database & Domain Layer) complete.**
-> Monorepo + CI + app skeletons (Phase 2); the **Store Definition Zod schema v1** and its
-> pure validate → sanitize → normalize pipeline in `packages/shared`; the normalized
-> **Prisma schema** (15 tables) + first migration + `PrismaModule`; the Store Definition
-> ⇄ rows **mapper**. Still no product features — `apps/api` exposes only `/health` and
-> `/ready`. Next: **Phase 4 — Authentication**.
+> **Status: Phase 4 (Authentication) complete.**
+> Monorepo + CI (Phase 2); **Store Definition Zod schema v1** + pipeline + normalized
+> **Prisma schema** (15 tables) + mapper (Phase 3); **Google sign-in** via Auth.js with a
+> short-lived JWT the API verifies, first-login user provisioning, `GET /me`, and a guarded
+> `(dashboard)` route group (Phase 4). Store generation/editing not built yet.
+> Next: **Phase 5 — AI Generation Engine**.
 
 ## Overview
 
@@ -79,7 +79,9 @@ Prerequisites: Node 22 (`.nvmrc`), pnpm 10, Docker. Nothing else global.
 
 ```bash
 cp apps/api/.env.example apps/api/.env    # set ANTHROPIC_API_KEY (used from Phase 5)
-cp apps/web/.env.example apps/web/.env    # Google keys come in Phase 4
+cp apps/web/.env.example apps/web/.env    # set AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET + a real
+                                         # AUTH_SECRET (`npx auth secret`); keep AUTH_JWT_SECRET
+                                         # identical in both .env files
 pnpm install
 pnpm db:up                                # docker compose: Postgres 16 on host port 5433
 pnpm db:migrate                           # apply Prisma migrations
@@ -96,12 +98,16 @@ Env is per-app (`apps/api/.env` for server/DB/AI, `apps/web/.env` for browser/au
 
 ## Environment configuration
 
-> Defined in Phase 2. Planned variables (server-only in `apps/api`):
-> `DATABASE_URL`, `AI_PROVIDER` (default `anthropic`), `ANTHROPIC_API_KEY` (plus
-> `OPENAI_API_KEY` / `GEMINI_API_KEY` when those providers are used), `AUTH_JWT_SECRET`.
-> Web: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET`, `AUTH_JWT_SECRET`,
-> `NEXT_PUBLIC_API_URL`.
-> AI keys never appear in `apps/web` or any `NEXT_PUBLIC_` variable.
+Per-app, documented in each `.env.example`.
+
+- **`apps/api/.env`** (server-only): `DATABASE_URL`, `AI_PROVIDER` (default `anthropic`),
+  `ANTHROPIC_API_KEY` (+ `OPENAI_API_KEY` / `GEMINI_API_KEY` if switched), `AUTH_JWT_SECRET`,
+  `API_PORT`.
+- **`apps/web/.env`**: `NEXT_PUBLIC_API_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_GOOGLE_ID`,
+  `AUTH_GOOGLE_SECRET`, `AUTH_JWT_SECRET`.
+- `AUTH_JWT_SECRET` (≥16 chars) must be **identical** in both files — it signs/verifies the
+  API JWT. AI keys never appear in `apps/web` or any `NEXT_PUBLIC_` variable.
+- Google OAuth client: authorized redirect URI `http://localhost:3000/api/auth/callback/google`.
 
 ## Database
 
@@ -136,11 +142,11 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phase 2 complete: pnpm + Turborepo monorepo, `apps/web` (Next.js 15 / React 19 / Tailwind v4
-/ shadcn wired), `apps/api` (NestJS 11 + HealthModule), `packages/shared` + `packages/config`,
-ESLint/Prettier/tsconfig presets, Docker Compose Postgres, GitHub Actions CI. `pnpm dev` boots
-both apps. All Phase-1 decisions resolved (`docs/decisions/OPEN-QUESTIONS.md`).
-Next: **Phase 3 — Database & Domain Layer**.
+Phases 1–4 complete. Foundation (monorepo, CI), the Store Definition schema + pipeline +
+Prisma model + mapper, and Google authentication (Auth.js → short-lived API JWT →
+`JwtStrategy` → first-login provisioning → `GET /me`, guarded `(dashboard)` group) are in
+place. API endpoints: `/health`, `/ready`, `/me`. Decisions log:
+`docs/decisions/OPEN-QUESTIONS.md`. Next: **Phase 5 — AI Generation Engine**.
 
 ## Future roadmap
 

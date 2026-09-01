@@ -34,6 +34,15 @@ guards/ dto/ domain/
 - A global `AllExceptionsFilter` maps domain errors → the standard error envelope
   (`docs/api/api-contract.md`).
 
+## Auth (Phase 4)
+
+- `JwtAuthGuard` is a global `APP_GUARD` — every route needs a valid API JWT. Opt public
+  routes out with `@Public()` (only health so far). Never remove the global guard.
+- `JwtStrategy` (`passport-jwt`) verifies signature + `iss` (`xandevo-web`) + `aud`
+  (`xandevo-api`) + `exp`; constants from `@xandevo/shared/auth`. `validate` → 
+  `UsersService.upsertFromClaims` (keyed by Google `sub`).
+- Get the user with `@CurrentUser()`. `AUTH_JWT_SECRET` must match `apps/web`.
+
 ## Validation & security
 
 - Global `ValidationPipe`: `whitelist: true, forbidNonWhitelisted: true, transform: true`.

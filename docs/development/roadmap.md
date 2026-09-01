@@ -76,7 +76,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
   validator/normalizer/sanitizer incl. injection/oversize/malformed cases + mapper
   round-trip identity + minimal-diff edit + dangling-reference rejection; no `any` in shared.
 
-## Phase 4 — Authentication
+## Phase 4 — Authentication  ✅ COMPLETE (2026-09-01)
 
 - **Objective:** Google login + API auth.
 - **Scope:** Auth.js (Google) in `apps/web`; session → short-lived JWT for API (ADR-005);
@@ -232,7 +232,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 | 1 | Docs + skills + ADRs exist with real content; user approval |
 | 2 | Clone→install→dev works; CI green on skeleton |
 | 3 | Full normalized schema (~15 tables, per-type section tables, FK refs) migrates clean; Store Definition v1 + validators tested vs adversarial input; mapper round-trip identity + minimal-diff |
-| 4 | Google sign-in e2e; API 401s without token; `/me` works |
+| 4 | API 401s (no token / bad sig / wrong iss·aud / expired) + `/me` provisions & returns; middleware redirects `/dashboard`; sign-in/out buttons wired. Browser Google e2e → Phase 11 |
 | 5 | `/generate` pipeline tested with Fake + fixtures; no SDK leakage; no key exposure |
 | 6 | Prompt→generation→builder-store flow; component + store tests; RSC/client discipline |
 | 7 | Every section renders; theme via CSS vars; no raw HTML; memoization verified |
