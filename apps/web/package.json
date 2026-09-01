@@ -15,10 +15,13 @@
     "@xandevo/shared": "workspace:*",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "jose": "5.9.6",
     "lucide-react": "0.469.0",
     "next": "15.1.6",
+    "next-auth": "5.0.0-beta.25",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "server-only": "0.0.1",
     "tailwind-merge": "2.6.0"
   },
   "devDependencies": {
@@ -27,6 +30,7 @@
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.1.0",
+    "@testing-library/user-event": "14.5.2",
     "@types/node": "22.10.2",
     "@types/react": "19.0.2",
     "@types/react-dom": "19.0.2",
