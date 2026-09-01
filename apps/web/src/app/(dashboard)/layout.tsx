@@ -10,6 +10,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-dvh">
+      <a
+        href="#main"
+        className="bg-background focus:ring-ring sr-only rounded border px-3 py-2 text-sm focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:ring-2"
+      >
+        Skip to content
+      </a>
       <header className="flex items-center justify-between border-b px-6 py-3">
         <Link href="/dashboard" className="font-semibold tracking-tight">
           Xandevo
@@ -19,7 +25,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <SignOutButton />
         </div>
       </header>
-      <main className="mx-auto max-w-3xl p-6">{children}</main>
+      <main id="main" className="mx-auto max-w-5xl p-6">
+        {children}
+      </main>
     </div>
   );
 }
