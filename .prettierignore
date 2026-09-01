@@ -5,3 +5,8 @@ dist
 coverage
 pnpm-lock.yaml
 *.md
+
+# Vendored harness / skill tooling — never reformat.
+.agents
+.claude
+apps/api/prisma/migrations

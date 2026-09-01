@@ -17,7 +17,9 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,css}\"",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
-    "db:logs": "docker compose logs -f postgres"
+    "db:logs": "docker compose logs -f postgres",
+    "db:migrate": "pnpm --filter @xandevo/api db:migrate",
+    "db:generate": "pnpm --filter @xandevo/api db:generate"
   },
   "devDependencies": {
     "@xandevo/config": "workspace:*",
@@ -29,7 +31,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@nestjs/core",
+      "@prisma/client",
       "esbuild",
+      "prisma",
       "sharp",
       "unrs-resolver"
     ]
