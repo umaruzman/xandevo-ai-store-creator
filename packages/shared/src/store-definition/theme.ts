@@ -100,6 +100,9 @@ export const themeSchema = z.object({
 export type Theme = z.infer<typeof themeSchema>;
 export type ThemeColors = z.infer<typeof themeColorsSchema>;
 export type ThemeComponents = z.infer<typeof themeComponentsSchema>;
+export type ProductCardStyle = z.infer<typeof productCardStyleSchema>;
+export type ButtonStyle = z.infer<typeof buttonStyleSchema>;
+export type CategoryCardStyle = z.infer<typeof categoryCardStyleSchema>;
 
 // ── Preset defaults ─────────────────────────────────────────────────────────
 // The AI (and editor) may supply a partial theme; the normalizer fills gaps from
