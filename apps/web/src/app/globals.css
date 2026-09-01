@@ -79,5 +79,78 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    overflow-x: hidden;
+  }
+}
+
+/* ── Public surfaces (landing + sign-in) — one committed world ──────────────
+   Scoped to `.lp` so the shadcn app tokens (dashboard/editor) are untouched.
+   Palette: deep oasis green as the primary dark, limestone/oat grounds, a
+   single burnt-amber accent — a Gulf reading of "forest premium", not the
+   cream + brass default. Display face is a grotesque, not a serif. */
+.lp {
+  --lp-bg: #edece4;
+  --lp-bg-deep: #e4e3d8;
+  --lp-surface: #f7f6f1;
+  --lp-ink: #17211c;
+  --lp-ink-soft: #55605a;
+  --lp-accent: #c1702a;
+  --lp-accent-bright: #d68a45;
+  --lp-line: #d3d1c4;
+  --lp-forest: #1e3a32;
+  --lp-forest-soft: #2c4f45;
+
+  background-color: var(--lp-bg);
+  color: var(--lp-ink);
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.lp ::selection {
+  background: var(--lp-accent);
+  color: var(--lp-surface);
+}
+
+.lp-display {
+  font-family: var(--font-display, 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.lp-eyebrow {
+  font-family: var(--font-sans, sans-serif);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@keyframes lp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Entrance is additive: content is fully visible by default and only animates
+   when motion is welcome, so a stalled animation can never hide the hero. */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-rise {
+    animation: lp-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .lp-rise-1 {
+    animation-delay: 0.06s;
+  }
+  .lp-rise-2 {
+    animation-delay: 0.14s;
+  }
+  .lp-rise-3 {
+    animation-delay: 0.22s;
+  }
+  .lp-rise-4 {
+    animation-delay: 0.3s;
   }
 }

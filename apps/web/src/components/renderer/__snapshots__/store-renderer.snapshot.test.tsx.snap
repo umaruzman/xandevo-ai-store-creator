@@ -12,31 +12,31 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
     Complimentary UAE delivery on orders over AED 500
   </div>
   <header
-    class="border-b border-[var(--sf-border)] px-4 py-4 sm:px-6 flex flex-col items-center gap-2 text-center"
+    class="bg-[var(--sf-background)]/90 z-20 border-b border-[var(--sf-border)] px-4 py-4 backdrop-blur-sm sm:px-6 sticky top-0 flex flex-col items-center gap-2 text-center"
   >
     <span
-      class="text-lg"
+      class="text-lg tracking-tight"
       style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight);"
     >
       Maison Oud
     </span>
     <nav
-      class="flex flex-wrap gap-4 text-sm"
+      class="flex flex-wrap items-center gap-5 text-sm"
     >
       <a
-        class="opacity-80 hover:opacity-100"
+        class="relative opacity-70 transition-opacity hover:opacity-100"
         href="#home"
       >
         Shop
       </a>
       <a
-        class="opacity-80 hover:opacity-100"
+        class="relative opacity-70 transition-opacity hover:opacity-100"
         href="#about"
       >
         About
       </a>
       <a
-        class="opacity-80 hover:opacity-100"
+        class="relative opacity-70 transition-opacity hover:opacity-100"
         href="#contact"
       >
         Contact
@@ -105,26 +105,74 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
         <ul
           class="grid gap-4 grid-cols-2 sm:grid-cols-3"
         >
-          <li>
-            <span
-              class="flex aspect-video items-end rounded-[var(--sf-radius)] border bg-[var(--sf-muted-bg)] p-3 font-medium"
+          <li
+            class=""
+          >
+            <a
+              class="group relative block aspect-[4/5] overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-border)]"
+              href="#oud"
             >
-              Oud & Agarwood
-            </span>
+              <img
+                alt=""
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22600%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220.65%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(238%2024%25%2090%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(264%2026%25%2074%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22glow%22%20cx%3D%220.3%22%20cy%3D%220.22%22%20r%3D%220.9%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(238%2040%25%2097%25)%22%20stop-opacity%3D%220.85%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(238%2040%25%2097%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23bg)%22%2F%3E%3Ccircle%20cx%3D%2268%22%20cy%3D%2253%22%20r%3D%2226%22%20fill%3D%22hsl(264%2030%25%2066%25)%22%20opacity%3D%220.45%22%2F%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23glow)%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2272%22%20x2%3D%22100%22%20y2%3D%2266%22%20stroke%3D%22hsl(238%2024%25%2040%25)%22%20stroke-width%3D%220.4%22%20opacity%3D%220.35%22%2F%3E%3Ctext%20x%3D%228%22%20y%3D%2292%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%229%22%20font-weight%3D%22600%22%20letter-spacing%3D%220.5%22%20fill%3D%22hsl(238%2028%25%2032%25)%22%20opacity%3D%220.8%22%3EO%26%2338%3B%3C%2Ftext%3E%3C%2Fsvg%3E"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/65 to-transparent"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 p-3 text-sm font-medium text-white"
+              >
+                Oud & Agarwood
+              </span>
+            </a>
           </li>
-          <li>
-            <span
-              class="flex aspect-video items-end rounded-[var(--sf-radius)] border bg-[var(--sf-muted-bg)] p-3 font-medium"
+          <li
+            class=""
+          >
+            <a
+              class="group relative block aspect-[4/5] overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-border)]"
+              href="#floral"
             >
-              Floral
-            </span>
+              <img
+                alt=""
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22600%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220.65%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(220%2024%25%2090%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(246%2026%25%2074%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22glow%22%20cx%3D%220.3%22%20cy%3D%220.22%22%20r%3D%220.9%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(220%2040%25%2097%25)%22%20stop-opacity%3D%220.85%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(220%2040%25%2097%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23bg)%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%224%22%20r%3D%2226%22%20fill%3D%22hsl(246%2030%25%2066%25)%22%20opacity%3D%220.45%22%2F%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23glow)%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2272%22%20x2%3D%22100%22%20y2%3D%2266%22%20stroke%3D%22hsl(220%2024%25%2040%25)%22%20stroke-width%3D%220.4%22%20opacity%3D%220.35%22%2F%3E%3Ctext%20x%3D%228%22%20y%3D%2292%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%229%22%20font-weight%3D%22600%22%20letter-spacing%3D%220.5%22%20fill%3D%22hsl(220%2028%25%2032%25)%22%20opacity%3D%220.8%22%3EF%3C%2Ftext%3E%3C%2Fsvg%3E"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/65 to-transparent"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 p-3 text-sm font-medium text-white"
+              >
+                Floral
+              </span>
+            </a>
           </li>
-          <li>
-            <span
-              class="flex aspect-video items-end rounded-[var(--sf-radius)] border bg-[var(--sf-muted-bg)] p-3 font-medium"
+          <li
+            class=""
+          >
+            <a
+              class="group relative block aspect-[4/5] overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-border)]"
+              href="#amber"
             >
-              Amber & Musk
-            </span>
+              <img
+                alt=""
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22600%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220.65%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(99%2024%25%2090%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(125%2026%25%2074%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22glow%22%20cx%3D%220.3%22%20cy%3D%220.22%22%20r%3D%220.9%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(99%2040%25%2097%25)%22%20stop-opacity%3D%220.85%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(99%2040%25%2097%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23bg)%22%2F%3E%3Ccircle%20cx%3D%2249%22%20cy%3D%2236%22%20r%3D%2226%22%20fill%3D%22hsl(125%2030%25%2066%25)%22%20opacity%3D%220.45%22%2F%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23glow)%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2272%22%20x2%3D%22100%22%20y2%3D%2266%22%20stroke%3D%22hsl(99%2024%25%2040%25)%22%20stroke-width%3D%220.4%22%20opacity%3D%220.35%22%2F%3E%3Ctext%20x%3D%228%22%20y%3D%2292%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%229%22%20font-weight%3D%22600%22%20letter-spacing%3D%220.5%22%20fill%3D%22hsl(99%2028%25%2032%25)%22%20opacity%3D%220.8%22%3EA%26%2338%3B%3C%2Ftext%3E%3C%2Fsvg%3E"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/65 to-transparent"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 p-3 text-sm font-medium text-white"
+              >
+                Amber & Musk
+              </span>
+            </a>
           </li>
         </ul>
       </div>
@@ -146,64 +194,76 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
           class="grid gap-4 grid-cols-2 sm:grid-cols-3"
         >
           <article
-            class="relative flex flex-col justify-end overflow-hidden rounded-[var(--sf-radius)] p-2 shadow-[var(--sf-shadow)] transition-transform duration-200 hover:-translate-y-1"
+            class="group relative flex flex-col justify-end overflow-hidden rounded-[var(--sf-radius)] p-2 shadow-[var(--sf-shadow)] transition-transform duration-200 hover:-translate-y-1"
           >
-            <img
-              alt="Royal Oud 50ml"
-              class="w-full object-cover aspect-square"
-              loading="lazy"
-              src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(16%2055%25%2082%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(56%2055%25%2068%25)%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22600%22%20fill%3D%22hsl(16%2040%25%2030%25)%22%3ERO%3C%2Ftext%3E%3C%2Fsvg%3E"
-            />
             <div
-              class="flex flex-col gap-0.5 p-3"
+              class="relative overflow-hidden rounded-[var(--sf-radius)]"
             >
+              <img
+                alt="Royal Oud 50ml"
+                class="w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] aspect-square"
+                loading="lazy"
+                src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22600%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220.65%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(16%2024%25%2090%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(42%2026%25%2074%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22glow%22%20cx%3D%220.3%22%20cy%3D%220.22%22%20r%3D%220.9%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(16%2040%25%2097%25)%22%20stop-opacity%3D%220.85%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(16%2040%25%2097%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23bg)%22%2F%3E%3Ccircle%20cx%3D%2246%22%20cy%3D%2224%22%20r%3D%2226%22%20fill%3D%22hsl(42%2030%25%2066%25)%22%20opacity%3D%220.45%22%2F%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23glow)%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2272%22%20x2%3D%22100%22%20y2%3D%2266%22%20stroke%3D%22hsl(16%2024%25%2040%25)%22%20stroke-width%3D%220.4%22%20opacity%3D%220.35%22%2F%3E%3Ctext%20x%3D%228%22%20y%3D%2292%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%229%22%20font-weight%3D%22600%22%20letter-spacing%3D%220.5%22%20fill%3D%22hsl(16%2028%25%2032%25)%22%20opacity%3D%220.8%22%3ERO%3C%2Ftext%3E%3C%2Fsvg%3E"
+              />
+              <span
+                class="pointer-events-none absolute inset-0 rounded-[var(--sf-radius)] ring-1 ring-inset ring-black/5"
+              />
+              <span
+                class="absolute left-2 top-2 rounded-full bg-[var(--sf-accent)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--sf-primary-contrast)]"
+              >
+                bestseller
+              </span>
+              <span
+                class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent"
+              />
               <div
-                class="flex items-baseline justify-between gap-2"
+                class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-white"
               >
                 <span
                   class="text-sm font-medium"
                 >
                   Royal Oud 50ml
                 </span>
+                <span
+                  class="text-sm opacity-90"
+                >
+                  AED 899
+                </span>
               </div>
-              <span
-                class="text-sm opacity-70"
-              >
-                AED 899.00
-              </span>
-              <span
-                class="mt-1 w-fit rounded-full border px-2 py-0.5 text-[10px] uppercase"
-              >
-                bestseller
-              </span>
             </div>
           </article>
           <article
-            class="relative flex flex-col justify-end overflow-hidden rounded-[var(--sf-radius)] p-2 shadow-[var(--sf-shadow)] transition-transform duration-200 hover:-translate-y-1"
+            class="group relative flex flex-col justify-end overflow-hidden rounded-[var(--sf-radius)] p-2 shadow-[var(--sf-shadow)] transition-transform duration-200 hover:-translate-y-1"
           >
-            <img
-              alt="Hindi Oud Intense"
-              class="w-full object-cover aspect-square"
-              loading="lazy"
-              src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(24%2055%25%2082%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(64%2055%25%2068%25)%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22600%22%20fill%3D%22hsl(24%2040%25%2030%25)%22%3EHO%3C%2Ftext%3E%3C%2Fsvg%3E"
-            />
             <div
-              class="flex flex-col gap-0.5 p-3"
+              class="relative overflow-hidden rounded-[var(--sf-radius)]"
             >
+              <img
+                alt="Hindi Oud Intense"
+                class="w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] aspect-square"
+                loading="lazy"
+                src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22600%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220.65%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(24%2024%25%2090%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(50%2026%25%2074%25)%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22glow%22%20cx%3D%220.3%22%20cy%3D%220.22%22%20r%3D%220.9%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(24%2040%25%2097%25)%22%20stop-opacity%3D%220.85%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(24%2040%25%2097%25)%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23bg)%22%2F%3E%3Ccircle%20cx%3D%2254%22%20cy%3D%2242%22%20r%3D%2226%22%20fill%3D%22hsl(50%2030%25%2066%25)%22%20opacity%3D%220.45%22%2F%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22url(%23glow)%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2272%22%20x2%3D%22100%22%20y2%3D%2266%22%20stroke%3D%22hsl(24%2024%25%2040%25)%22%20stroke-width%3D%220.4%22%20opacity%3D%220.35%22%2F%3E%3Ctext%20x%3D%228%22%20y%3D%2292%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%229%22%20font-weight%3D%22600%22%20letter-spacing%3D%220.5%22%20fill%3D%22hsl(24%2028%25%2032%25)%22%20opacity%3D%220.8%22%3EHO%3C%2Ftext%3E%3C%2Fsvg%3E"
+              />
+              <span
+                class="pointer-events-none absolute inset-0 rounded-[var(--sf-radius)] ring-1 ring-inset ring-black/5"
+              />
+              <span
+                class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent"
+              />
               <div
-                class="flex items-baseline justify-between gap-2"
+                class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-white"
               >
                 <span
                   class="text-sm font-medium"
                 >
                   Hindi Oud Intense
                 </span>
+                <span
+                  class="text-sm opacity-90"
+                >
+                  AED 1,299
+                </span>
               </div>
-              <span
-                class="text-sm opacity-70"
-              >
-                AED 1,299.00
-              </span>
             </div>
           </article>
         </div>

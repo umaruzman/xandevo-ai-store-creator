@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type MouseEvent } from 'react';
 
 import { StoreRenderer } from '@/components/renderer/store-renderer';
 import { Button } from '@/components/ui/button';
@@ -12,18 +12,18 @@ import { cn } from '@/lib/utils';
 type Device = 'desktop' | 'mobile';
 
 /**
- * Preview chrome (device toggle, dirty state, Save/Start over) wrapping the
- * schema-driven `<StoreRenderer>`. Reads the working definition from the builder
- * store, so it re-renders live as the editor mutates state.
+ * The preview pane of the customizer: a toolbar (device toggle, dirty state,
+ * Save / Start over) over a full-height storefront render. Navigation between
+ * pages happens by clicking the storefront's own nav links — no separate tabs.
  */
 export function StorePreview({
   onStartOver,
-  editing = true,
-  onToggleEditing,
+  sidebarOpen = true,
+  onOpenSidebar,
 }: {
   onStartOver: () => void;
-  editing?: boolean;
-  onToggleEditing?: () => void;
+  sidebarOpen?: boolean;
+  onOpenSidebar?: () => void;
 }) {
   const definition = useBuilderStore((s) => s.definition);
   const storeId = useBuilderStore((s) => s.storeId);
@@ -35,10 +35,37 @@ export function StorePreview({
   const [device, setDevice] = useState<Device>('desktop');
   const [pageSlug, setPageSlug] = useState('home');
   const [saveError, setSaveError] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const create = useCreateStore();
   const update = useUpdateStore(storeId ?? '');
   const saving = create.isPending || update.isPending;
+
+  const slugs = useMemo(
+    () => new Set((definition?.pages ?? []).map((p) => p.slug)),
+    [definition?.pages],
+  );
+
+  /** Intercept clicks on the rendered storefront's own hash links: a page slug
+   *  switches the previewed page; anything else scrolls within the canvas. */
+  const onCanvasClick = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      const anchor = (e.target as HTMLElement).closest('a');
+      const href = anchor?.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      e.preventDefault();
+      const id = href.slice(1);
+      if (slugs.has(id)) {
+        setPageSlug(id);
+        canvasRef.current?.scrollTo({ top: 0 });
+      } else if (id) {
+        canvasRef.current
+          ?.querySelector(`#${CSS.escape(id)}`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    },
+    [slugs],
+  );
 
   if (!definition) return null;
 
@@ -74,90 +101,68 @@ export function StorePreview({
     }
   }
 
+  const currentPage = definition.pages.find((p) => p.slug === pageSlug);
+
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="flex items-center gap-2 text-sm font-medium">
+    <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex flex-wrap items-center gap-3 border-b px-4 py-2.5">
+        {!sidebarOpen && onOpenSidebar ? (
+          <Button variant="outline" size="sm" onClick={onOpenSidebar}>
+            Customize
+          </Button>
+        ) : null}
+
+        <div className="mr-auto min-w-0">
+          <p className="flex items-center gap-2 truncate text-sm font-medium">
             {definition.meta.name}
+            <span className="text-muted-foreground font-normal">
+              / {currentPage?.title ?? 'Home'}
+            </span>
             {isDirty ? (
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
                 Unsaved changes
               </span>
             ) : null}
           </p>
-          <p className="text-muted-foreground text-xs">
-            {storeId ? 'Saved store' : 'Draft'} · {definition.pages.length} pages ·{' '}
-            {definition.products.length} products
-          </p>
         </div>
-        <div className="flex items-center gap-2">
-          {onToggleEditing && !editing ? (
-            <Button variant="outline" size="sm" onClick={onToggleEditing}>
-              Edit store
-            </Button>
-          ) : null}
-          <div role="group" aria-label="Preview width" className="flex rounded-md border p-0.5">
-            {(['desktop', 'mobile'] as const).map((d) => (
-              <button
-                key={d}
-                type="button"
-                aria-pressed={device === d}
-                onClick={() => setDevice(d)}
-                className={cn(
-                  'rounded px-2.5 py-1 text-xs capitalize transition-colors',
-                  device === d ? 'bg-foreground text-background' : 'text-muted-foreground',
-                )}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
-          <Button variant="outline" size="sm" onClick={onStartOver}>
-            Start over
-          </Button>
-          <Button size="sm" onClick={onSave} disabled={saving || (!isDirty && !!storeId)}>
-            {saving ? 'Saving…' : storeId ? 'Save changes' : 'Save store'}
-          </Button>
+
+        <div role="group" aria-label="Preview width" className="flex rounded-md border p-0.5">
+          {(['desktop', 'mobile'] as const).map((d) => (
+            <button
+              key={d}
+              type="button"
+              aria-pressed={device === d}
+              onClick={() => setDevice(d)}
+              className={cn(
+                'rounded px-2.5 py-1 text-xs capitalize transition-colors',
+                device === d ? 'bg-foreground text-background' : 'text-muted-foreground',
+              )}
+            >
+              {d}
+            </button>
+          ))}
         </div>
+        <Button variant="outline" size="sm" onClick={onStartOver}>
+          Start over
+        </Button>
+        <Button size="sm" onClick={onSave} disabled={saving || (!isDirty && !!storeId)}>
+          {saving ? 'Saving…' : storeId ? 'Save changes' : 'Save store'}
+        </Button>
       </div>
 
-      {definition.pages.length > 1 ? (
-        <div role="group" aria-label="Preview page" className="flex flex-wrap gap-1">
-          {[...definition.pages]
-            .sort((a, b) => a.order - b.order)
-            .map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                aria-pressed={pageSlug === p.slug}
-                onClick={() => setPageSlug(p.slug)}
-                className={cn(
-                  'rounded-full border px-3 py-1 text-xs transition-colors',
-                  pageSlug === p.slug
-                    ? 'bg-foreground text-background border-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {p.title}
-              </button>
-            ))}
-        </div>
-      ) : null}
-
       {saveError ? (
-        <p role="alert" className="text-destructive text-xs">
+        <p role="alert" className="text-destructive border-b px-4 py-2 text-xs">
           {saveError}
         </p>
       ) : null}
 
-      <div className="bg-muted/30 overflow-hidden rounded-xl border">
+      <div ref={canvasRef} className="bg-muted/40 min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div
+          onClickCapture={onCanvasClick}
           className={cn(
-            'mx-auto overflow-y-auto',
-            device === 'mobile' ? 'max-w-[390px]' : 'max-w-full',
+            'bg-background mx-auto overflow-hidden rounded-xl border shadow-sm transition-[max-width] duration-200',
+            device === 'mobile' ? 'max-w-[390px]' : 'max-w-[1200px]',
           )}
-          style={{ maxHeight: '82vh' }}
         >
           <StoreRenderer definition={definition} pageSlug={pageSlug} />
         </div>

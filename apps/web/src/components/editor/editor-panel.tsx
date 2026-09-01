@@ -79,7 +79,7 @@ export function EditorPanel() {
   const contrast = text && background ? contrastRatio(text, background) : undefined;
 
   return (
-    <div className="space-y-5 overflow-y-auto p-4" style={{ maxHeight: '82vh' }}>
+    <div className="h-full space-y-5 overflow-y-auto p-4">
       <Group title="Store">
         <TextField label="Name" path={['meta', 'name']} />
         <TextField label="Tagline" path={['meta', 'tagline']} />
