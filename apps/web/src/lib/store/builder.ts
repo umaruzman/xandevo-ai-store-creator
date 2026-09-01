@@ -1,7 +1,8 @@
-import type { StoreDefinition } from '@xandevo/shared';
-import { create } from 'zustand';
+import { storeDefinitionSchema, type StoreDefinition } from '@xandevo/shared';
+import { create, type StateCreator } from 'zustand';
 
 import { hashValue } from '@/lib/hash';
+import { getAtPath, type Path, pathKey, setAtPath } from '@/lib/set-path';
 
 export type GenerationStatus = 'idle' | 'pending' | 'success' | 'error';
 
@@ -10,11 +11,15 @@ export interface GeneratedPayload {
   promptVersion: string;
 }
 
-/** Server-store shape hydrated in Phase 9. */
 export interface SavedStore {
   id: string;
   definition: StoreDefinition;
   promptVersion: string;
+}
+
+export interface FieldResult {
+  ok: boolean;
+  error?: string;
 }
 
 interface BuilderState {
@@ -25,15 +30,25 @@ interface BuilderState {
   /** Hash of the last persisted definition; `null` = never saved. */
   savedHash: string | null;
   generation: { status: GenerationStatus; error?: string };
+  /** Per-field validation errors from rejected edits, keyed by `pathKey(path)`. */
+  editErrors: Record<string, string>;
 
   startGeneration: () => void;
   setGenerated: (payload: GeneratedPayload) => void;
   setGenerationError: (message: string) => void;
-  /** Phase 9 — hydrate an existing store for editing. */
   loadFromServer: (store: SavedStore) => void;
-  /** Phase 9 — mark the current definition as persisted. */
   markSaved: (store: SavedStore) => void;
   reset: () => void;
+
+  /**
+   * Validated, immutable edit of one field. Sets `value` at `path`, re-validates
+   * the whole definition against the Zod schema, and commits ONLY if it passes —
+   * always via `set({ definition })` with a structurally-shared new object, so a
+   * history middleware (zundo) wraps this with no refactor.
+   */
+  updateField: (path: Path, value: unknown) => FieldResult;
+  /** Move a section within its page and renumber `order`. */
+  moveSection: (pageId: string, sectionId: string, direction: 'up' | 'down') => FieldResult;
 }
 
 const initial = {
@@ -42,9 +57,10 @@ const initial = {
   definition: null,
   savedHash: null,
   generation: { status: 'idle' as GenerationStatus },
+  editErrors: {} as Record<string, string>,
 };
 
-export const useBuilderStore = create<BuilderState>((set) => ({
+export const builderStateCreator: StateCreator<BuilderState> = (set, get) => ({
   ...initial,
 
   startGeneration: () => set({ generation: { status: 'pending' } }),
@@ -54,7 +70,9 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       definition,
       promptVersion,
       storeId: null,
-      savedHash: null, // freshly generated — never saved
+      // Baseline for dirty tracking = the generated definition; an edit makes it dirty.
+      savedHash: hashValue(definition),
+      editErrors: {},
       generation: { status: 'success' },
     }),
 
@@ -66,6 +84,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       definition: store.definition,
       promptVersion: store.promptVersion,
       savedHash: hashValue(store.definition),
+      editErrors: {},
       generation: { status: 'idle' },
     }),
 
@@ -76,8 +95,50 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       savedHash: hashValue(store.definition),
     }),
 
-  reset: () => set({ ...initial }),
-}));
+  reset: () => set({ ...initial, editErrors: {} }),
+
+  updateField: (path, value) => {
+    const current = get().definition;
+    if (!current) return { ok: false, error: 'no store loaded' };
+
+    const candidate = setAtPath(current, path, value);
+    const parsed = storeDefinitionSchema.safeParse(candidate);
+    const key = pathKey(path);
+
+    if (!parsed.success) {
+      const issue =
+        parsed.error.issues.find((i) => pathKey(i.path as Path).startsWith(key)) ??
+        parsed.error.issues[0];
+      const message = issue?.message ?? 'invalid value';
+      set((s) => ({ editErrors: { ...s.editErrors, [key]: message } }));
+      return { ok: false, error: message };
+    }
+
+    set((s) => {
+      const { [key]: _removed, ...rest } = s.editErrors;
+      return { definition: candidate, editErrors: rest };
+    });
+    return { ok: true };
+  },
+
+  moveSection: (pageId, sectionId, direction) => {
+    const def = get().definition;
+    if (!def) return { ok: false, error: 'no store loaded' };
+    const pageIndex = def.pages.findIndex((p) => p.id === pageId);
+    if (pageIndex < 0) return { ok: false, error: 'page not found' };
+
+    const sections = [...def.pages[pageIndex]!.sections].sort((a, b) => a.order - b.order);
+    const from = sections.findIndex((s) => s.id === sectionId);
+    const to = direction === 'up' ? from - 1 : from + 1;
+    if (from < 0 || to < 0 || to >= sections.length) return { ok: false, error: 'cannot move' };
+
+    [sections[from], sections[to]] = [sections[to]!, sections[from]!];
+    const renumbered = sections.map((s, i) => (s.order === i ? s : { ...s, order: i }));
+    return get().updateField(['pages', pageIndex, 'sections'], renumbered);
+  },
+});
+
+export const useBuilderStore = create<BuilderState>()(builderStateCreator);
 
 /** Derived, never stored: has the working definition diverged from the saved one? */
 export function selectIsDirty(state: BuilderState): boolean {
@@ -87,4 +148,9 @@ export function selectIsDirty(state: BuilderState): boolean {
 
 export function selectHasDefinition(state: BuilderState): boolean {
   return state.definition !== null;
+}
+
+/** Read a value at `path` from the current working definition (for field components). */
+export function readField(state: BuilderState, path: Path): unknown {
+  return state.definition ? getAtPath(state.definition, path) : undefined;
 }
