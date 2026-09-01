@@ -54,6 +54,11 @@ function cleanValue(key: string, value: unknown): unknown {
   return value;
 }
 
+/** Strip markup / control characters from every string in an arbitrary object tree. */
+export function cleanStrings<T>(obj: T): T {
+  return cleanValue('', obj) as T;
+}
+
 /**
  * Strip markup / control characters from every string in a schema-valid input.
  * Enum, slug, colour and URL values are unaffected (no markup, no internal
