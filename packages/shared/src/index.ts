@@ -1,10 +1,19 @@
 /**
- * @xandevo/shared — cross-app contract package.
+ * @xandevo/shared — the cross-app contract.
  *
- * Phase 2: placeholder only. Phase 3 fills this with the Store Definition
- * Zod schema, inferred types, API DTO shapes, and shared enums.
- * See docs/architecture/store-definition.md.
+ * - `store-definition/*` — the versioned Zod schema (input + normalized forms),
+ *   inferred types, enums, and forward migrations.
+ * - `domain/*` — the pure untrusted-input pipeline: schema → business validation
+ *   → sanitization → normalization.
+ * - `api/*` — REST transport DTO types.
+ *
+ * Test fixtures are also available from `@xandevo/shared/testing`.
  */
 
-/** Store Definition schema version currently supported by the app. */
-export const STORE_DEFINITION_SCHEMA_VERSION = 1 as const;
+export * from './store-definition/index.js';
+export * from './domain/index.js';
+export * from './api/index.js';
+export * from './testing/fixtures.js';
+export * from './testing/ids.js';
+
+export { CURRENT_SCHEMA_VERSION as STORE_DEFINITION_SCHEMA_VERSION } from './store-definition/store-definition.js';
