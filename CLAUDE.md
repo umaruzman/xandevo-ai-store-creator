@@ -14,11 +14,21 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 9 — Persistence & API Integration. COMPLETE.** Next: **Phase 10 — UI/UX, Security &
-Performance** (real landing page, dashboard/builder polish, loading/error boundaries, CSP +
-Helmet + CORS lockdown, rate-limit tuning, a11y + perf pass). No new features.
+**Phase 10 — UI/UX, Security & Performance. COMPLETE.** Next: **Phase 11 — Testing & Quality
+Assurance** (close coverage gaps, full e2e green, no skipped tests). No new features.
 
 What exists now:
+- **Security & perf (Phase 10):** `apps/web` nonce CSP set per-request in `middleware.ts`
+  (`lib/csp.ts` — prod `script-src 'self' 'nonce-…' 'strict-dynamic'`, no `unsafe-eval`;
+  `style-src 'unsafe-inline'` deliberate for renderer inline theme tokens); static security
+  headers + `poweredByHeader:false` in `next.config.ts`; real RSC landing page
+  (`app/page.tsx`); `loading.tsx`/`error.tsx`/`not-found.tsx`/`global-error.tsx` boundaries
+  on dashboard + store routes; skip-link + `<main id="main">` landmark in `(dashboard)/layout.tsx`.
+  `apps/api`: Helmet in `bootstrap.ts` (minimal CSP `default-src 'none'`, `X-Powered-By`
+  stripped, CORP `same-site`); `AuditInterceptor` (`APP_INTERCEPTOR`) logs one structured
+  line per mutating request (no bodies/PII); throttler tuned (generate 10 / stores 30 /
+  patch 60 / global 240 per min); 256 KB body cap. `.github/PULL_REQUEST_TEMPLATE.md` carries
+  the `security.md` §11 checklist.
 - **Persistence (Phase 9):** `apps/api` `StoresModule` — `POST/GET/PATCH/DELETE /stores`,
   `StoreOwnerGuard` (404 not 403), `StoresService` (`validateStoreDefinition` server-side
   re-check), `StoresRepository` (one aggregate repo; `prisma.$transaction`; `PATCH .definition`
@@ -75,10 +85,10 @@ What exists now:
 - Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
   `AI_PROVIDER=fake` runs generation with no API key (dev/CI).
 
-Phase 10 introduces the real landing page + CSP/Helmet/CORS lockdown + a11y/perf pass; the
-current `app/page.tsx` is still a placeholder and CORS is off. Not yet built (post-MVP,
-documented in `api-contract.md`): regenerate-into-store, version history, media upload,
-public storefronts. See `docs/development/roadmap.md`.
+Phase 11 closes test coverage gaps and locks quality gates. Still prohibited: queues, Redis,
+CDN/edge infra (future scaling). Not yet built (post-MVP, documented in `api-contract.md`):
+regenerate-into-store, version history, media upload, public storefronts, `next/image`
+(deferred until real media). See `docs/development/roadmap.md`.
 
 ## Technology stack
 

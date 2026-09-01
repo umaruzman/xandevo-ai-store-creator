@@ -50,22 +50,35 @@ validated.
 | Oversized content / cost abuse | Length caps per field; token budget per request; rate limiting. |
 | SSRF via image URLs | MVP uses placeholder images only; `url` image kind disabled until an upload pipeline with host allowlist + fetch proxy exists. |
 
-## 5. Web (XSS / CSRF / headers)
+## 5. Web (XSS / CSRF / headers)  *(implemented — Phase 10)*
 
-- React auto-escaping; no raw HTML injection of user or AI content.
-- `next/image` with `alt` required; remote patterns restricted to allowlisted hosts.
-- Content Security Policy (Phase 10): restrict `script-src`, `style-src`, `img-src`,
-  `connect-src` to self + known hosts.
-- CSRF: API is token-based (no ambient cookie auth) so classic CSRF does not apply to it.
-  Auth.js handles its own CSRF for the OAuth flow.
-- Cookies: httpOnly, Secure, SameSite=Lax.
+- React auto-escaping; renderer never uses `dangerouslySetInnerHTML` on generated content.
+- **CSP** — nonce-based, set per request in `apps/web/src/middleware.ts` (`lib/csp.ts`):
+  prod `script-src 'self' 'nonce-…' 'strict-dynamic'` (no `unsafe-eval`); dev relaxes for
+  HMR. `style-src 'self' 'unsafe-inline'` is deliberate — the storefront renderer applies
+  the validated theme through inline `style={}` (tokens only, never script).
+  `img-src 'self' data: https:`, `connect-src 'self'`, `frame-ancestors 'none'`,
+  `object-src 'none'`, `base-uri`/`form-action 'self'`.
+- **Static headers** via `next.config.ts`: `X-Content-Type-Options: nosniff`,
+  `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`,
+  `Permissions-Policy` locking camera/mic/geo/topics. `poweredByHeader: false`.
+- CSRF: the API is token-based (no ambient cookie auth). The web BFF route handlers under
+  `app/api/*` are same-origin only; Auth.js handles CSRF for the OAuth flow.
+- Cookies: httpOnly, Secure, SameSite=Lax (Auth.js session).
+- `next/image` deferred until real media upload; placeholder previews are inline SVG data
+  URIs on `<img alt>`.
 
-## 6. API abuse & rate limiting
+## 6. API abuse & rate limiting  *(implemented — Phase 5/9/10)*
 
-- `@nestjs/throttler`: `/generate` ~10/min/user; mutations ~60/min/user; reads ~240/min/user.
-- Per-user quotas on generations (config-driven) — hook for future billing.
-- Helmet for security headers on the API. CORS: exact web origin only, `Authorization`
-  header allowed, credentials off.
+- `@nestjs/throttler` (global 240/min/user, keyed by `req.user.id` via `UserThrottlerGuard`):
+  `POST /generate` 10/min, `POST /stores` 30/min, `PATCH /stores/:id` 60/min.
+- **Helmet** on the API (`bootstrap.ts`) — minimal CSP (`default-src 'none'`),
+  `X-Powered-By` stripped, `Cross-Origin-Resource-Policy: same-site`.
+- **CORS is OFF** — the browser never calls the API directly (all traffic is server-side:
+  RSC / Server Actions / BFF route handlers), so no cross-origin allowance is needed.
+- `AuditInterceptor` (`APP_INTERCEPTOR`) logs one structured line per mutating request
+  (`requestId`, `userId`, method, route, status, latency) — never bodies/params.
+- Per-user generation quotas remain a hook for future billing.
 
 ## 7. Secret management
 
@@ -96,9 +109,19 @@ validated.
 
 ## 11. Checklist for every PR touching a boundary
 
-- [ ] New input has a DTO with full constraints, or a Zod schema.
-- [ ] New store query is `userId`-scoped.
-- [ ] No generated content rendered as HTML.
-- [ ] No secret added to client-visible config.
-- [ ] New url field is host-allowlisted or structured.
-- [ ] Rate limit considered for new mutating/expensive route.
+Mirrored in `.github/PULL_REQUEST_TEMPLATE.md`.
+
+- [ ] New input has a DTO with full `class-validator` constraints, or is validated by a Zod
+      schema. Client-supplied `definition` re-runs `validateStoreDefinition`.
+- [ ] Every new store/aggregate query is `userId`-scoped; `/:id` routes use `StoreOwnerGuard`
+      (404, not 403) and the service re-checks.
+- [ ] No generated / user content rendered as HTML (`dangerouslySetInnerHTML`, `eval`).
+- [ ] No secret in `NEXT_PUBLIC_*`, client bundles, API responses, or logs. New URL fields
+      are host-allowlisted or structured link targets — never raw hrefs.
+- [ ] Rate limit (`@Throttle`) set for a new mutating / expensive route; body-size fits the
+      256 KB limit.
+- [ ] New browser → server call goes through a Server Action or a same-origin BFF route
+      handler (never a direct cross-origin call to the API; CORS stays off).
+- [ ] New client-executed script source is covered by the CSP (`lib/csp.ts`); no new
+      `unsafe-*` without justification.
+- [ ] Mutating route emits an audit line; no bodies/params/PII beyond `userId` logged.

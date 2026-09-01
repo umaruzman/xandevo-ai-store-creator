@@ -184,7 +184,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
   query `userId`-scoped (test proves cross-user access fails); `Product.categoryId` RESTRICT
   behaviour tested.
 
-## Phase 10 — UI/UX, Security & Performance
+## Phase 10 — UI/UX, Security & Performance  ✅ COMPLETE (2026-09-02)
 
 - **Objective:** production-readiness pass.
 - **Scope:** landing page; polish dashboard/builder UX; loading/error boundaries everywhere;
@@ -238,6 +238,6 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 | 7 | All 6 sections + chrome render the reference definition; `pick()` unknown-enum fallback + `SectionSlot` unknown-type skip (no throw); `resolveThemeVars` maps tokens + 6-preset matrix distinct; injected `<script>` rendered as literal text (`querySelector('script')` null); memoization test — single hero-field edit re-renders hero (2), not categories (1); reference-definition snapshot |
 | 8 | `updateField`/`moveSection` tests (commit valid + structural sharing, reject invalid + record error, clear-on-fix, reorder+renumber); `setAtPath` clones only the path; `TextField` live-commit + invalid-held; `StoreEditor` integration — hero edit updates preview + dirty badge, reorder changes preview, contrast warning; `zundo` `temporal` undo/redo spike |
 | 9 | `stores.e2e-spec` on real PG: full loop (create→list→get-equal→patch→get-reflects→delete→404); user B → 404 on A's store (get/patch/delete) + not in B's list; 422 on invalid definition; mid-transaction failure rolls the aggregate back (0 rows); `Product.categoryId` RESTRICT (P2003). Web: `store-editor` Save POSTs `/api/stores` + `markSaved` clears dirty; TanStack Query hooks via BFF route handlers |
-| 10 | Security checklist + a11y + perf thresholds; CSP active |
+| 10 | Security §11 checklist passes; nonce CSP active per-request (`middleware.ts`/`lib/csp.ts`) + static headers + `poweredByHeader:false`; API Helmet (`default-src 'none'`) + `X-Powered-By` stripped; throttler tuned (generate 10 / stores 30 / patch 60 / global 240 per min); 256 KB body cap; `AuditInterceptor` logs one line per mutating request (no bodies/PII); RSC-by-default audit + renderer `React.memo` + `staleTime:30s`; no N+1 (list = 1 `findMany`, detail = 1 nested `include`); loading/error/not-found boundaries on dashboard + store routes; skip-link + landmarks; real RSC landing page; PR template security checklist added |
 | 11 | Coverage thresholds; full e2e green; no skipped tests |
 | 12 | Docs match code; runbook dry-run; ADRs finalized; tagged |

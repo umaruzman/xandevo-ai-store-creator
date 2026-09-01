@@ -2,23 +2,28 @@
 
 Split into **MVP now** and **future scaling** (documented, not built).
 
-## Performance — MVP now
+## Performance — MVP now  *(verified — Phase 10)*
 
-- **Server Components by default** in `apps/web`; ship minimal client JS. Client boundaries
-  only around builder/editor/renderer.
-- **Renderer efficiency:** memoized section components, selector-based Zustand subscriptions
-  so a single field edit re-renders only the affected section, stable ids as keys.
-- **Caching:** TanStack Query with sensible `staleTime` for stores list/detail; RSC `fetch`
-  cache for read-only data; no premature CDN/edge caching of dynamic pages.
-- **DB indexes:** `Store(userId)`, `Store(userId, updatedAt)`, `User(googleSub)` unique,
-  `User(email)` unique. Add as the schema is written (Phase 3).
-- **API payloads:** return only needed fields; list endpoint returns store summaries
-  (no full `definition`), detail returns the full document.
-- **AI latency:** generation is a single explicit user action with a progress UI; 60 s
-  timeout; no speculative pre-generation. Response streamed to the client only as a final
-  validated object (no partial-render of unvalidated data).
-- **Images:** `next/image`, placeholder strategy avoids heavy assets in MVP.
-- **Avoid premature work:** no Redis, no queue, no read replicas, no micro-optimizations
+- **Server Components by default** — every route (`page.tsx`, landing, dashboard,
+  `/stores/[storeId]`) is an RSC; only interactive leaves (`CreateStoreFlow`, `StoreEditor`,
+  fields, renderer, auth buttons) are `'use client'`. `Providers` wraps children without
+  declientising them.
+- **Renderer efficiency:** `React.memo` section components; `RendererProvider` context
+  memoized on `[theme, categories, products]` so a single-section content edit re-renders
+  only that section (tested). Stable `section.id` keys.
+- **Caching:** TanStack Query `staleTime: 30 s`, `refetchOnWindowFocus: false`
+  (`app/providers.tsx`). BFF route handlers use `apiFetch(..., { cache: 'no-store' })`; RSC
+  reads are per-request. No CDN/edge caching of dynamic pages.
+- **DB indexes (Phase 3 schema, verified):** `Store(userId)`, `Store(userId, updatedAt DESC)`,
+  `Store(userId, slug)` unique, `User.googleSub` / `User.email` unique, every FK indexed,
+  `Product(storeId, categoryId)`.
+- **No N+1:** `GET /stores` is one `findMany` of summaries; `GET /stores/:id` is one nested
+  `include` (Prisma issues a bounded number of queries by relation depth, not per row).
+- **Loading/error UX:** `loading.tsx` skeletons + `error.tsx` boundaries on the dashboard and
+  store routes; `not-found.tsx` for missing/non-owned stores; `global-error.tsx`.
+- **Images:** placeholder previews are inline SVG data URIs; `next/image` is deferred until
+  real media upload.
+- **Avoid premature work:** no Redis, no queue, no read replicas, no micro-optimisations
   without a measured problem.
 
 ## Future scaling — when needed

@@ -2,12 +2,14 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 9 (Persistence & API Integration) complete.**
+> **Status: Phase 10 (UI/UX, Security & Performance) complete.**
 > The full loop works: sign in → generate → edit in the split editor ‖ preview → **Save**.
 > Stores persist to Postgres (normalized aggregate, transactional write, server-side
 > re-validation), list on the dashboard, and reopen at `/stores/[id]` to keep editing.
 > API: `/health`, `/ready`, `/me`, `POST /generate`, full `/stores` CRUD.
-> Next: **Phase 10 — UI/UX, Security & Performance** (landing page, CSP, a11y/perf).
+> Hardened: nonce CSP + security headers on web, Helmet + audit logging + tuned rate limits
+> on the API, real landing page, loading/error boundaries, a11y landmarks, RSC/perf pass.
+> Next: **Phase 11 — Testing & Quality Assurance**.
 
 ## Overview
 
@@ -142,11 +144,14 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phases 1–9 complete — the MVP loop is end to end: generate → edit → save → reload. API:
-`/health`, `/ready`, `/me`, `POST /generate`, full `/stores` CRUD (normalized transactional
-persistence). Set `AI_PROVIDER=fake` in `apps/api/.env` to generate without an Anthropic
-key. Decisions log: `docs/decisions/OPEN-QUESTIONS.md`.
-Next: **Phase 10 — UI/UX, Security & Performance**.
+Phases 1–10 complete — the MVP loop is end to end: generate → edit → save → reload, with a
+production-readiness pass on top (nonce CSP + security headers, API Helmet + audit logging +
+tuned rate limits + 256 KB body cap, real landing page, loading/error/not-found boundaries,
+a11y landmarks, RSC/memoization/perf audit). API: `/health`, `/ready`, `/me`, `POST /generate`,
+full `/stores` CRUD (normalized transactional persistence). Set `AI_PROVIDER=fake` in
+`apps/api/.env` to generate without an Anthropic key. Decisions log:
+`docs/decisions/OPEN-QUESTIONS.md`.
+Next: **Phase 11 — Testing & Quality Assurance**.
 
 ## Future roadmap
 
