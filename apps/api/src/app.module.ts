@@ -1,12 +1,13 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AllExceptionsFilter } from './common/all-exceptions.filter';
+import { AuditInterceptor } from './common/audit.interceptor';
 import { UserThrottlerGuard } from './common/user-throttler.guard';
 import { GenerationModule } from './generation/generation.module';
 import { HealthModule } from './health/health.module';
@@ -45,6 +46,7 @@ import { UsersModule } from './users/users.module';
       }),
     },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
   ],
 })
 export class AppModule {}

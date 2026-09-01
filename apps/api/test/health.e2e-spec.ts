@@ -29,4 +29,11 @@ describe('Health (e2e)', () => {
   it('GET /ready -> 200 { status: ok }', () => {
     return request(app.getHttpServer()).get('/ready').expect(200).expect({ status: 'ok' });
   });
+
+  it('sends Helmet security headers and a locked-down CSP', async () => {
+    const res = await request(app.getHttpServer()).get('/health').expect(200);
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['content-security-policy']).toContain("default-src 'none'");
+    expect(res.headers['x-powered-by']).toBeUndefined();
+  });
 });
