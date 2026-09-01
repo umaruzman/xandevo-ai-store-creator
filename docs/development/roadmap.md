@@ -43,7 +43,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
   start with no manual fix-ups; CI passes; both apps typecheck; shadcn/ui installed; no
   feature code.
 
-## Phase 3 — Database & Domain Layer
+## Phase 3 — Database & Domain Layer  ✅ COMPLETE (2026-09-01)
 
 - **Objective:** normalized data model + the Store Definition schema package + the
   definition⇄rows mapper.

@@ -14,18 +14,26 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 2 — Repository & Development Foundation. COMPLETE.** Next: **Phase 3 — Database &
-Domain Layer** (Prisma schema per ADR-006, Store Definition Zod schema v1 in
-`packages/shared`, domain validators/normalizers/sanitizer + mapper, all with tests).
+**Phase 3 — Database & Domain Layer. COMPLETE.** Next: **Phase 4 — Authentication**
+(Auth.js Google in `apps/web`, JWT verified by `apps/api`, `UsersModule` first-login upsert,
+`GET /me`, protected route group).
 
-What exists now: pnpm+Turborepo monorepo; `apps/web` (Next 15 / React 19 / Tailwind v4 /
-shadcn wired, placeholder page); `apps/api` (NestJS 11, only `HealthModule`);
-`packages/shared` (stub) + `packages/config` (eslint/tsconfig/prettier presets);
-Docker Compose Postgres; GitHub Actions CI running `turbo run typecheck lint test build`.
+What exists now:
+- **`packages/shared`** — Store Definition **Zod schema v1** (`store-definition/*`: input +
+  normalized forms, enums, `CURRENT_SCHEMA_VERSION`, `migrateToLatest` scaffold), the pure
+  pipeline `buildStoreDefinition()` (`domain/*`: schema → `assertBusinessRules` →
+  `sanitizeStoreDefinitionInput` → `normalizeStoreDefinition`, throwing `StoreDefinitionError`),
+  API DTO types (`api/*`), test fixtures (`testing/*`, also at `@xandevo/shared/testing`).
+- **`apps/api`** — `prisma/schema.prisma` (15 tables per ADR-006) + first migration;
+  `PrismaModule`/`PrismaService`; `ConfigModule`; `HealthModule` (`/ready` does a real DB
+  ping); `src/stores/domain/store-definition.mapper.ts` (`toRows`/`toDefinition`, pure,
+  round-trip tested). No controllers/endpoints beyond health, no repositories yet.
+- Monorepo, CI, Docker Compose Postgres (host port **5433**) from Phase 2.
+- Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
 
 Still prohibited until their phase: landing page, authentication, Google OAuth, AI
 generation pipeline, store editor, live preview, production API endpoints beyond health,
-database application logic. See `docs/development/roadmap.md`.
+store repositories / persistence wiring (Phase 9). See `docs/development/roadmap.md`.
 
 ## Technology stack
 

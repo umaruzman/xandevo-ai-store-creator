@@ -124,9 +124,13 @@ return `StoreDefinition`. Never persists. Never returns partial/unvalidated data
   `promptVersion` + `schemaVersion` + **`theme` / `navigation` `jsonb`** (bounded
   presentation tokens only — no JSON definition blob).
 - The **Store Definition** (shared Zod schema) stays the contract for generation, validation,
-  rendering, and the editor. It is not the storage format.
-- `store-definition.mapper.ts`: `toRows(definition)` and `toDefinition(rows)`. Round-trip is
-  identity after normalization (tested).
+  rendering, and the editor. It is not the storage format. The pure pipeline
+  (`buildStoreDefinition`: schema → business → sanitize → normalize) lives in
+  `@xandevo/shared/domain` and is reused by the web app; the API wraps it.
+- `store-definition.mapper.ts` (Phase 3, `apps/api/src/stores/domain/`): `toRows(definition,
+  storeId)` and `toDefinition(rows)` over plain DB-shaped row types (no Prisma coupling, no
+  timestamps). Round-trip is identity after normalization (tested), and a one-field edit
+  produces a minimal row diff (tested).
 - Writes (`POST`/`PATCH /stores`): validate definition → `toRows` → **single transaction**
   upserting `Store` and diff-upserting children, deleting removed rows, renumbering `order`.
 - Reads (`GET /stores/:id`): bounded indexed queries for the aggregate → `toDefinition` →

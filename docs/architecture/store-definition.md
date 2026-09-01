@@ -87,15 +87,21 @@ Section  (discriminated union on `type`)
     'hero'       -> { headline, subheadline?, description, cta: { label, target },
                       heroLayout: 'centered'|'split-left'|'split-right'|'fullbleed-overlay'|'minimal',
                       height: 'compact'|'standard'|'tall'|'viewport', overlayStrength: 0..3 }
-    'categories' -> { title?, categoryIds: string[], layout: 'grid'|'scroller'|'list', columns: 2..4 }
+    'categories' -> { title?, categoryIds: string[], categoriesLayout: 'grid'|'scroller'|'list', columns: 2..4 }
     'productGrid' -> { title?, categoryId?, productIds?: string[], limit?,
-                       layout: 'grid'|'carousel', columns: 2..4, cardVariant?: <productCard override>,
+                       productGridLayout: 'grid'|'carousel', columns: 2..4, cardVariant?: <productCard override>,
                        showViewAll: boolean }
     'richText'   -> { title?, body, width: 'narrow'|'prose'|'wide' }   // plain text / constrained markdown subset
     'contact'    -> { title?, description?, email?, phone?, address?, showForm: boolean,
-                      layout: 'form-left'|'form-right'|'stacked' }
+                      contactLayout: 'form-left'|'form-right'|'stacked' }
     'cta'        -> { headline, description?, button: { label, target },
-                      layout: 'banner'|'boxed'|'split', emphasis: 'subtle'|'bold' }
+                      ctaLayout: 'banner'|'boxed'|'split', emphasis: 'subtle'|'bold' }
+
+// The per-type layout enum is named `<type>Layout` so it never collides with the
+// shared section `layout` object. `id` and `order` are absent from AI output —
+// normalization assigns them; the input form references entities by slug
+// (`categorySlugs`, `categorySlug`, `productSlugs`, `cta.target: {type:'page', slug}`)
+// and normalization resolves those to `categoryIds` / `productIds` / `pageId`.
 
 Category
   id, name, slug, description?, accentColor?         // token override, optional & rare
@@ -105,8 +111,15 @@ Product
   image: { kind: 'placeholder', seed: string, style?: 'photo'|'illustration'|'pattern'|'mono' }
        | { kind: 'url', url: string }               // url host allowlisted (later)
   featured?: boolean                                 // renderer gives a larger card / ribbon
-  badge?: 'New'|'Limited'|'Bestseller'
+  badge?: 'new'|'limited'|'bestseller'
 ```
+
+**Implementation (Phase 3):** the schema lives in `@xandevo/shared/store-definition` as
+two Zod schemas — `storeDefinitionInputSchema` (AI output; slug refs, no ids) and
+`storeDefinitionSchema` (normalized; id refs). The pure pipeline
+`buildStoreDefinition(raw)` in `@xandevo/shared/domain` runs
+parse → schema → `assertBusinessRules` → `sanitizeStoreDefinitionInput` →
+`normalizeStoreDefinition`, throwing `StoreDefinitionError` (stage + issues) on failure.
 
 - **Coherence:** the model picks a `preset`, then overrides only a few tokens. The prompt
   gives each preset a personality so combinations stay sensible (`luxury` ≠ `radius: full` +

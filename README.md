@@ -2,10 +2,12 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 2 (Repository & Development Foundation) complete.**
-> The monorepo, tooling, CI, and app skeletons exist and boot. No product features yet —
-> `apps/web` serves a placeholder page and `apps/api` exposes only `/health` and `/ready`.
-> Feature work begins in Phase 3 (database & domain layer).
+> **Status: Phase 3 (Database & Domain Layer) complete.**
+> Monorepo + CI + app skeletons (Phase 2); the **Store Definition Zod schema v1** and its
+> pure validate → sanitize → normalize pipeline in `packages/shared`; the normalized
+> **Prisma schema** (15 tables) + first migration + `PrismaModule`; the Store Definition
+> ⇄ rows **mapper**. Still no product features — `apps/api` exposes only `/health` and
+> `/ready`. Next: **Phase 4 — Authentication**.
 
 ## Overview
 
@@ -76,18 +78,21 @@ docs/
 Prerequisites: Node 22 (`.nvmrc`), pnpm 10, Docker. Nothing else global.
 
 ```bash
-cp .env.example .env     # fill in ANTHROPIC_API_KEY; Google keys come in Phase 4
+cp apps/api/.env.example apps/api/.env    # set ANTHROPIC_API_KEY (used from Phase 5)
+cp apps/web/.env.example apps/web/.env    # Google keys come in Phase 4
 pnpm install
-pnpm db:up               # docker compose: Postgres 16 on :5432
-pnpm dev                 # turborepo: web (:3000) + api (:4000) together
+pnpm db:up                                # docker compose: Postgres 16 on host port 5433
+pnpm db:migrate                           # apply Prisma migrations
+pnpm dev                                  # turborepo: web (:3000) + api (:4000)
 ```
 
-- `pnpm dev` — run both apps
-- `pnpm build` / `pnpm lint` / `pnpm typecheck` / `pnpm test` — run across the workspace via Turborepo
-- `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` — local Postgres
+- `pnpm dev` / `pnpm build` / `pnpm lint` / `pnpm typecheck` / `pnpm test` — workspace-wide via Turborepo
+- `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` — local Postgres (host port 5433 to avoid clashing with a local 5432)
+- `pnpm db:migrate` — `prisma migrate dev` in `apps/api`
 - `pnpm format` — Prettier
 
-`pnpm db:migrate` (Prisma) arrives in Phase 3. API health check: `curl localhost:4000/health`.
+API check: `curl localhost:4000/health` (liveness) and `curl localhost:4000/ready` (DB reachable).
+Env is per-app (`apps/api/.env` for server/DB/AI, `apps/web/.env` for browser/auth).
 
 ## Environment configuration
 

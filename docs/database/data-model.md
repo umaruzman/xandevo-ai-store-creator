@@ -1,7 +1,8 @@
-# Conceptual Data Model
+# Data Model
 
-PostgreSQL via Prisma. This is the **conceptual** model. The Prisma schema is authored in
-Phase 3. Do not write it now.
+PostgreSQL via Prisma. **Implemented in Phase 3** — the authoritative schema is
+`apps/api/prisma/schema.prisma` with the first migration under
+`apps/api/prisma/migrations/`. This document tracks the conceptual model and rationale.
 
 ## 1. Persistence decision (ADR-006 — normalized, JSON only for presentation tokens)
 
@@ -16,9 +17,20 @@ Resolved 2026-09-01 (revised same day):
   `footer`, and `announcementBar` are `jsonb` columns, each validated by its Zod sub-schema
   before write — bounded enum/token sets with no cross-row references. `meta` (`name`,
   `tagline`, `locale`, `currency`) are typed columns.
-- **Shared section layout** (`background`, `container`, `paddingY`, `align`) → typed enum
-  columns on the `sections` base row. Type-specific layout enums (e.g. `hero.heroLayout`,
-  `productGrid.columns`) → typed columns on the matching `<type>_sections` table.
+- **Enum strategy (Phase 3):** *structural* enums are Postgres enum types —
+  `StoreStatus`, `SectionType`, `LinkTargetType`, `ProductImageKind`, `ProductBadge`.
+  *Presentational* layout values (`background`, `container`, `paddingY`, `align`,
+  `heroLayout`, `height`, `categoriesLayout`, `productGridLayout`, `contactLayout`,
+  `ctaLayout`, `emphasis`, `width`, `imageStyle`) are plain `String` columns guarded by Zod
+  on write — the renderer already falls back to a default for any value it does not
+  recognise, and these churn as the design system is tuned (Phase 7), so a migration per
+  tweak buys little. Promote to a Postgres enum later if a value ever needs DB-level
+  integrity.
+- **Shared section layout** (`background`, `container`, `paddingY`, `align`) → columns on the
+  `sections` base row. Type-specific layout → columns on the matching `<type>_sections`
+  table, named `<type>Layout` (e.g. `heroLayout`, `categoriesLayout`) so they never collide
+  with the shared `layout`.
+- `Store.slug` is derived from `meta.name` by the mapper (Phase 3); uniqueness is per user.
 - The **Store Definition** (Zod schema, `packages/shared`) is the contract for generation,
   validation, rendering, and the editor's working copy — **not** the storage format.
 - `store-definition.mapper.ts` (`toRows` / `toDefinition`) decomposes a validated definition
@@ -44,6 +56,10 @@ Exceptions: `Product.categoryId` = `RESTRICT`; `product_grid_sections.category_i
 link-target FKs (`*_target_page_id`, `*_target_section_id`) = `SET NULL`.
 
 ## 3. Fields
+
+> Below, `enum(...)` on a *structural* field (SectionType, LinkTargetType, StoreStatus,
+> ProductImageKind, ProductBadge) is a Postgres enum. On a *presentational* layout field it
+> denotes the bounded set Zod enforces on write — the column itself is `text` (see §1).
 
 **User**: `id` uuid pk, `googleSub` unique, `email` unique citext, `displayName`,
 `avatarUrl?`, `createdAt`, `updatedAt`.
@@ -73,17 +89,17 @@ Unique `(pageId, position)`.
 
 **cta_sections**: `sectionId` pk/fk, `headline`, `description?`, `buttonLabel`,
 `buttonTargetType` enum, `buttonTargetPageId?` fk, `buttonTargetSectionId?` fk,
-`buttonTargetUrl?`, `layout` enum(`banner`|`boxed`|`split`), `emphasis` enum(`subtle`|`bold`).
+`buttonTargetUrl?`, `ctaLayout` enum(`banner`|`boxed`|`split`), `emphasis` enum(`subtle`|`bold`).
 
 **contact_sections**: `sectionId` pk/fk, `title?`, `description?`, `email?`, `phone?`,
-`address?`, `showForm` bool, `layout` enum(`form-left`|`form-right`|`stacked`).
+`address?`, `showForm` bool, `contactLayout` enum(`form-left`|`form-right`|`stacked`).
 
 **product_grid_sections**: `sectionId` pk/fk, `title?`, `categoryId?` fk (set null),
-`limit?` int, `layout` enum(`grid`|`carousel`), `columns` int 2..4,
+`limit?` int, `productGridLayout` enum(`grid`|`carousel`), `columns` int 2..4,
 `cardVariant?` jsonb (productCard override; nullable), `showViewAll` bool.
 
-**categories_sections**: `sectionId` pk/fk, `title?`, `layout` enum(`grid`|`scroller`|`list`),
-`columns` int 2..4.
+**categories_sections**: `sectionId` pk/fk, `title?`,
+`categoriesLayout` enum(`grid`|`scroller`|`list`), `columns` int 2..4.
 
 **categories_section_items**: `sectionId` fk (cascade), `categoryId` fk (cascade),
 `position` int≥0. PK `(sectionId, categoryId)`; unique `(sectionId, position)`.
