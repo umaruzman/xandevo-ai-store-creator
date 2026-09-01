@@ -16,7 +16,15 @@ type Device = 'desktop' | 'mobile';
  * schema-driven `<StoreRenderer>`. Reads the working definition from the builder
  * store, so it re-renders live as the editor mutates state.
  */
-export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
+export function StorePreview({
+  onStartOver,
+  editing = true,
+  onToggleEditing,
+}: {
+  onStartOver: () => void;
+  editing?: boolean;
+  onToggleEditing?: () => void;
+}) {
   const definition = useBuilderStore((s) => s.definition);
   const storeId = useBuilderStore((s) => s.storeId);
   const promptText = useBuilderStore((s) => s.promptText);
@@ -25,6 +33,7 @@ export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
   const isDirty = useBuilderStore(selectIsDirty);
 
   const [device, setDevice] = useState<Device>('desktop');
+  const [pageSlug, setPageSlug] = useState('home');
   const [saveError, setSaveError] = useState<string | null>(null);
   const router = useRouter();
   const create = useCreateStore();
@@ -83,6 +92,11 @@ export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {onToggleEditing && !editing ? (
+            <Button variant="outline" size="sm" onClick={onToggleEditing}>
+              Edit store
+            </Button>
+          ) : null}
           <div role="group" aria-label="Preview width" className="flex rounded-md border p-0.5">
             {(['desktop', 'mobile'] as const).map((d) => (
               <button
@@ -91,7 +105,7 @@ export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
                 aria-pressed={device === d}
                 onClick={() => setDevice(d)}
                 className={cn(
-                  'rounded px-2.5 py-1 text-xs capitalize',
+                  'rounded px-2.5 py-1 text-xs capitalize transition-colors',
                   device === d ? 'bg-foreground text-background' : 'text-muted-foreground',
                 )}
               >
@@ -108,21 +122,44 @@ export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
         </div>
       </div>
 
+      {definition.pages.length > 1 ? (
+        <div role="group" aria-label="Preview page" className="flex flex-wrap gap-1">
+          {[...definition.pages]
+            .sort((a, b) => a.order - b.order)
+            .map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                aria-pressed={pageSlug === p.slug}
+                onClick={() => setPageSlug(p.slug)}
+                className={cn(
+                  'rounded-full border px-3 py-1 text-xs transition-colors',
+                  pageSlug === p.slug
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {p.title}
+              </button>
+            ))}
+        </div>
+      ) : null}
+
       {saveError ? (
         <p role="alert" className="text-destructive text-xs">
           {saveError}
         </p>
       ) : null}
 
-      <div className="bg-muted/30 overflow-hidden rounded-lg border">
+      <div className="bg-muted/30 overflow-hidden rounded-xl border">
         <div
           className={cn(
             'mx-auto overflow-y-auto',
             device === 'mobile' ? 'max-w-[390px]' : 'max-w-full',
           )}
-          style={{ maxHeight: '70vh' }}
+          style={{ maxHeight: '82vh' }}
         >
-          <StoreRenderer definition={definition} />
+          <StoreRenderer definition={definition} pageSlug={pageSlug} />
         </div>
       </div>
     </div>

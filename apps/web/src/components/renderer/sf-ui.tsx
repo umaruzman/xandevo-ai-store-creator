@@ -52,9 +52,9 @@ export function Heading({
   const Tag = `h${level}` as 'h1' | 'h2' | 'h3';
   return (
     <Tag
-      style={HEADING_STYLE}
+      style={level === 1 ? { ...HEADING_STYLE, letterSpacing: '-0.02em' } : HEADING_STYLE}
       className={cn(
-        level === 1 && 'text-3xl sm:text-4xl',
+        level === 1 && 'text-4xl leading-[1.05] sm:text-5xl lg:text-6xl',
         level === 2 && 'text-2xl sm:text-3xl',
         level === 3 && 'text-lg',
         className,

@@ -22,9 +22,9 @@ export const SECTION_CONTAINER: Record<string, string> = {
   narrow: 'mx-auto w-full max-w-2xl px-4 sm:px-6',
 };
 export const SECTION_PADDING: Record<string, string> = {
-  sm: 'py-8',
-  md: 'py-12 sm:py-16',
-  lg: 'py-16 sm:py-24',
+  sm: 'py-10 sm:py-12',
+  md: 'py-16 sm:py-20',
+  lg: 'py-24 sm:py-32',
 };
 export const SECTION_ALIGN: Record<string, string> = {
   left: 'text-left items-start',
@@ -32,18 +32,19 @@ export const SECTION_ALIGN: Record<string, string> = {
 };
 
 // ── Hero ──────────────────────────────────────────────────────────────────
+/** Alignment + gap for the hero's text column. Media placement is handled in the component. */
 export const HERO_LAYOUT: Record<string, string> = {
-  centered: 'flex flex-col gap-4 text-center items-center',
-  'split-left': 'flex flex-col gap-4 md:items-start md:text-left',
-  'split-right': 'flex flex-col gap-4 md:items-end md:text-right',
-  'fullbleed-overlay': 'flex flex-col gap-4 items-center text-center',
-  minimal: 'flex flex-col gap-2',
+  centered: 'flex flex-col items-center gap-5 text-center',
+  'split-left': 'flex flex-col items-start gap-5 text-left',
+  'split-right': 'flex flex-col items-start gap-5 text-left md:items-end md:text-right',
+  'fullbleed-overlay': 'flex flex-col items-center gap-6 text-center',
+  minimal: 'flex flex-col items-start gap-3 text-left',
 };
 export const HERO_HEIGHT: Record<string, string> = {
-  compact: 'min-h-[220px] justify-center',
-  standard: 'min-h-[340px] justify-center',
-  tall: 'min-h-[460px] justify-center',
-  viewport: 'min-h-[70vh] justify-center',
+  compact: 'min-h-[320px]',
+  standard: 'min-h-[440px]',
+  tall: 'min-h-[600px]',
+  viewport: 'min-h-[calc(100vh-4rem)]',
 };
 
 // ── Rich text ─────────────────────────────────────────────────────────────

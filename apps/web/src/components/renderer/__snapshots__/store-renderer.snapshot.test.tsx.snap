@@ -49,34 +49,43 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
       id="00000000-0000-4000-8000-000000000011"
     >
       <div
-        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-16 sm:py-20 text-left items-start"
       >
         <div
-          class="flex flex-col gap-4 items-center text-center min-h-[460px] justify-center rounded-[var(--sf-radius)] bg-[var(--sf-muted-bg)] p-8"
+          class="flex w-full flex-col items-center justify-center rounded-[var(--sf-radius)] px-6 py-20 sm:px-12 sm:py-28 bg-[var(--sf-text)] text-[var(--sf-surface)] min-h-[600px]"
           data-overlay-strength="2"
         >
-          <h1
-            class="text-3xl sm:text-4xl"
-            style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight); letter-spacing: var(--sf-letter-spacing);"
+          <div
+            class="max-w-xl flex flex-col items-center gap-6 text-center"
           >
-            The Art of Oud
-          </h1>
-          <p
-            class="text-lg opacity-80"
-          >
-            House of rare Arabian perfumery
-          </p>
-          <p
-            class="max-w-prose opacity-70"
-          >
-            Hand-blended fragrances sourced from Cambodia, Taif and Hindi oud.
-          </p>
-          <a
-            class="inline-flex items-center justify-center rounded-[var(--sf-button-radius)] font-medium transition-colors border border-[var(--sf-primary)] text-[var(--sf-primary)] h-10 px-5 text-sm mt-2"
-            href="#home"
-          >
-            Explore the collection
-          </a>
+            <span
+              aria-hidden="true"
+              class="block h-px w-14 bg-[var(--sf-secondary)]"
+              style="opacity: 0.9;"
+            />
+            <h1
+              class="text-4xl leading-[1.05] sm:text-5xl lg:text-6xl text-balance"
+              style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight); letter-spacing: -0.02em;"
+            >
+              The Art of Oud
+            </h1>
+            <p
+              class="text-lg sm:text-xl text-[var(--sf-secondary)]"
+            >
+              House of rare Arabian perfumery
+            </p>
+            <p
+              class="max-w-prose text-sm sm:text-base opacity-80"
+            >
+              Hand-blended fragrances sourced from Cambodia, Taif and Hindi oud.
+            </p>
+            <a
+              class="inline-flex items-center justify-center rounded-[var(--sf-button-radius)] font-medium border border-[var(--sf-primary)] text-[var(--sf-primary)] h-12 px-7 text-base mt-3 transition-transform duration-200 hover:-translate-y-0.5"
+              href="#home"
+            >
+              Explore the collection
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -85,7 +94,7 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
       id="00000000-0000-4000-8000-000000000012"
     >
       <div
-        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-16 sm:py-20 text-left items-start"
       >
         <h2
           class="text-2xl sm:text-3xl"
@@ -125,7 +134,7 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
       id="00000000-0000-4000-8000-000000000013"
     >
       <div
-        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-16 sm:py-20 text-left items-start"
       >
         <h2
           class="text-2xl sm:text-3xl"
@@ -211,7 +220,7 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
       id="00000000-0000-4000-8000-000000000014"
     >
       <div
-        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-16 sm:py-20 text-left items-start"
       >
         <div
           class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"

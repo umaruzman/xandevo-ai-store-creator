@@ -12,30 +12,101 @@ import { SectionShell } from './section-shell';
 
 type HeroSection = Extract<Section, { type: 'hero' }>;
 
+/**
+ * Storefront hero. Token-driven only — every colour, radius and font comes from a
+ * `--sf-*` custom property. Five layouts:
+ *  - `fullbleed-overlay` : a bold dark panel, content centred, gold hairline.
+ *  - `split-left` / `split-right` : text beside a framed media panel on md+.
+ *  - `centered` / `minimal` : a single text column.
+ */
 export const HeroSection = memo(function HeroSection({ section }: { section: HeroSection }) {
   const { theme, href } = useRenderer();
   const overlay = section.heroLayout === 'fullbleed-overlay';
+  const split = section.heroLayout === 'split-left' || section.heroLayout === 'split-right';
+  const mediaFirst = section.heroLayout === 'split-right';
+
+  const text = (
+    <div className={cn('max-w-xl', pick(HERO_LAYOUT, section.heroLayout, 'centered'))}>
+      <span
+        aria-hidden
+        className="block h-px w-14 bg-[var(--sf-secondary)]"
+        style={{ opacity: 0.9 }}
+      />
+      <Heading level={1} className="text-balance">
+        {section.headline}
+      </Heading>
+      {section.subheadline ? (
+        <p
+          className={cn(
+            'text-lg sm:text-xl',
+            overlay ? 'text-[var(--sf-secondary)]' : 'text-[var(--sf-text)]/70',
+          )}
+        >
+          {section.subheadline}
+        </p>
+      ) : null}
+      <p className={cn('max-w-prose text-sm sm:text-base', overlay ? 'opacity-80' : 'opacity-60')}>
+        {section.description}
+      </p>
+      <StoreButton
+        href={href(section.cta.target)}
+        style={{ ...theme.components.button, size: 'lg' }}
+        className="mt-3 transition-transform duration-200 hover:-translate-y-0.5"
+      >
+        {section.cta.label}
+      </StoreButton>
+    </div>
+  );
+
+  if (overlay) {
+    return (
+      <SectionShell id={section.id} layout={section.layout}>
+        <div
+          className={cn(
+            'flex w-full flex-col items-center justify-center rounded-[var(--sf-radius)] px-6 py-20 sm:px-12 sm:py-28',
+            'bg-[var(--sf-text)] text-[var(--sf-surface)]',
+            pick(HERO_HEIGHT, section.height, 'standard'),
+          )}
+          data-overlay-strength={section.overlayStrength}
+        >
+          {text}
+        </div>
+      </SectionShell>
+    );
+  }
+
+  if (split) {
+    return (
+      <SectionShell id={section.id} layout={section.layout}>
+        <div
+          className={cn(
+            'grid w-full items-center gap-10 md:grid-cols-2 md:gap-16',
+            pick(HERO_HEIGHT, section.height, 'standard'),
+          )}
+        >
+          <div className={cn('flex flex-col justify-center', mediaFirst && 'md:order-2')}>
+            {text}
+          </div>
+          <div
+            aria-hidden
+            className="relative hidden aspect-[4/5] w-full rounded-[var(--sf-radius)] border border-[var(--sf-border)] bg-[var(--sf-muted-bg)] md:block"
+          >
+            <span className="absolute inset-4 rounded-[calc(var(--sf-radius)-4px)] border border-[var(--sf-secondary)] opacity-40" />
+          </div>
+        </div>
+      </SectionShell>
+    );
+  }
 
   return (
     <SectionShell id={section.id} layout={section.layout}>
       <div
         className={cn(
-          pick(HERO_LAYOUT, section.heroLayout, 'centered'),
+          'flex w-full flex-col justify-center',
           pick(HERO_HEIGHT, section.height, 'standard'),
-          overlay && 'rounded-[var(--sf-radius)] bg-[var(--sf-muted-bg)] p-8',
         )}
-        data-overlay-strength={section.overlayStrength}
       >
-        <Heading level={1}>{section.headline}</Heading>
-        {section.subheadline ? <p className="text-lg opacity-80">{section.subheadline}</p> : null}
-        <p className="max-w-prose opacity-70">{section.description}</p>
-        <StoreButton
-          href={href(section.cta.target)}
-          style={theme.components.button}
-          className="mt-2"
-        >
-          {section.cta.label}
-        </StoreButton>
+        {text}
       </div>
     </SectionShell>
   );
