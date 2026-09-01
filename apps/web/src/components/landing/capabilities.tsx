@@ -6,7 +6,7 @@ export function Capabilities() {
     <section id="capabilities" className="bg-[color:var(--lp-bg-deep)]">
       <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
         <h2 className="lp-display max-w-2xl text-3xl text-[color:var(--lp-ink)] sm:text-4xl">
-          An AI commerce platform, not a template gallery
+          A real store, not a template
         </h2>
 
         <div className="mt-12 grid gap-4 lg:grid-cols-3">

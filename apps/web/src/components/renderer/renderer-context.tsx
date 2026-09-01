@@ -3,28 +3,38 @@
 import type { Category, LinkTarget, Product, StoreDefinition, Theme } from '@xandevo/shared';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
+import type { Path } from '@/lib/set-path';
+
 interface RendererValue {
   theme: Theme;
   categoryById: Map<string, Category>;
   productById: Map<string, Product>;
-  /** Resolve a structured link target to an in-preview href (no navigation in Phase 7). */
+  /** Resolve a structured link target to an in-preview href. */
   href: (target: LinkTarget) => string | undefined;
+  /** Inline editing: when `enabled`, rendered text becomes editable in place. */
+  edit: { enabled: boolean; onText: (path: Path, value: string) => void };
 }
 
 const RendererContext = createContext<RendererValue | null>(null);
 
+const noop = () => {};
+
 /**
  * Provides theme + catalogue lookups, memoized on the pieces that are stable
- * across a section content edit (`theme`, `categories`, `products`) — NOT the
- * whole `definition`. So editing one section's text leaves this context
- * referentially identical, and only that section's `React.memo` wrapper
- * re-renders. A theme or catalogue edit invalidates it and repaints (intended).
+ * across a section content edit (`theme`, `categories`, `products`, and the two
+ * editing handles) — NOT the whole `definition`. So editing one section's text
+ * leaves this context referentially identical, and only that section's
+ * `React.memo` wrapper re-renders.
  */
 export function RendererProvider({
   definition,
+  editEnabled = false,
+  onEditText,
   children,
 }: {
   definition: StoreDefinition;
+  editEnabled?: boolean;
+  onEditText?: (path: Path, value: string) => void;
   children: ReactNode;
 }) {
   const { theme, categories, products, pages } = definition;
@@ -32,8 +42,6 @@ export function RendererProvider({
   const value = useMemo<RendererValue>(() => {
     const categoryById = new Map(categories.map((c) => [c.id, c]));
     const productById = new Map(products.map((p) => [p.id, p]));
-    // Page slugs do not change on section content edits, so keeping `pages` out
-    // of the deps below is safe and keeps the context stable.
     const pageSlugById = new Map(pages.map((p) => [p.id, p.slug]));
     return {
       theme,
@@ -51,9 +59,10 @@ export function RendererProvider({
             return undefined;
         }
       },
+      edit: { enabled: editEnabled, onText: onEditText ?? noop },
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `pages` intentionally excluded (see above)
-  }, [theme, categories, products]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `pages` intentionally excluded (stable slugs)
+  }, [theme, categories, products, editEnabled, onEditText]);
 
   return <RendererContext.Provider value={value}>{children}</RendererContext.Provider>;
 }

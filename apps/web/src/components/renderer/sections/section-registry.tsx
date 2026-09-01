@@ -3,6 +3,8 @@
 import type { Section } from '@xandevo/shared';
 import type { ComponentType } from 'react';
 
+import type { Path } from '@/lib/set-path';
+
 import { CategoriesSection } from './categories-section';
 import { ContactSection } from './contact-section';
 import { CtaSection } from './cta-section';
@@ -10,7 +12,7 @@ import { HeroSection } from './hero-section';
 import { ProductGridSection } from './product-grid-section';
 import { RichTextSection } from './rich-text-section';
 
-type SectionComponent = ComponentType<{ section: never }>;
+type SectionComponent = ComponentType<{ section: never; path?: Path }>;
 
 /** `section.type` → component. Unknown types are handled by `<SectionSlot>`. */
 export const SECTION_REGISTRY: Record<Section['type'], SectionComponent> = {
@@ -24,9 +26,11 @@ export const SECTION_REGISTRY: Record<Section['type'], SectionComponent> = {
 
 export function SectionSlot({
   section,
+  path,
   registry = SECTION_REGISTRY,
 }: {
   section: Section;
+  path?: Path;
   registry?: Partial<Record<string, SectionComponent>>;
 }) {
   const Component = registry[section.type];
@@ -36,5 +40,5 @@ export function SectionSlot({
     }
     return null;
   }
-  return <Component section={section as never} />;
+  return <Component section={section as never} path={path} />;
 }

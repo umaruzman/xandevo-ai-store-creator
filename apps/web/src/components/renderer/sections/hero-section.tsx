@@ -3,23 +3,26 @@
 import type { Section } from '@xandevo/shared';
 import { memo } from 'react';
 
+import { sectionPropsEqual } from './memo-compare';
+
+import type { Path } from '@/lib/set-path';
 import { cn } from '@/lib/utils';
 
+import { EditableText } from '../editable-text';
 import { useRenderer } from '../renderer-context';
 import { HERO_HEIGHT, HERO_LAYOUT, pick } from '../recipes';
-import { Heading, StoreButton } from '../sf-ui';
+import { StoreButton } from '../sf-ui';
 import { SectionShell } from './section-shell';
 
 type HeroSection = Extract<Section, { type: 'hero' }>;
 
-/**
- * Storefront hero. Token-driven only — every colour, radius and font comes from a
- * `--sf-*` custom property. Five layouts:
- *  - `fullbleed-overlay` : a bold dark panel, content centred, gold hairline.
- *  - `split-left` / `split-right` : text beside a framed media panel on md+.
- *  - `centered` / `minimal` : a single text column.
- */
-export const HeroSection = memo(function HeroSection({ section }: { section: HeroSection }) {
+export const HeroSection = memo(function HeroSection({
+  section,
+  path = [],
+}: {
+  section: HeroSection;
+  path?: Path;
+}) {
   const { theme, href } = useRenderer();
   const overlay = section.heroLayout === 'fullbleed-overlay';
   const split = section.heroLayout === 'split-left' || section.heroLayout === 'split-right';
@@ -32,28 +35,36 @@ export const HeroSection = memo(function HeroSection({ section }: { section: Her
         className="block h-px w-14 bg-[var(--sf-secondary)]"
         style={{ opacity: 0.9 }}
       />
-      <Heading level={1} className="text-balance">
-        {section.headline}
-      </Heading>
+      <EditableText
+        heading={1}
+        path={[...path, 'headline']}
+        value={section.headline}
+        className="text-balance"
+      />
       {section.subheadline ? (
-        <p
+        <EditableText
+          as="p"
+          path={[...path, 'subheadline']}
+          value={section.subheadline}
           className={cn(
             'text-lg sm:text-xl',
             overlay ? 'text-[var(--sf-secondary)]' : 'text-[var(--sf-text)]/70',
           )}
-        >
-          {section.subheadline}
-        </p>
+        />
       ) : null}
-      <p className={cn('max-w-prose text-sm sm:text-base', overlay ? 'opacity-80' : 'opacity-60')}>
-        {section.description}
-      </p>
+      <EditableText
+        as="p"
+        multiline
+        path={[...path, 'description']}
+        value={section.description}
+        className={cn('max-w-prose text-sm sm:text-base', overlay ? 'opacity-80' : 'opacity-60')}
+      />
       <StoreButton
         href={href(section.cta.target)}
         style={{ ...theme.components.button, size: 'lg' }}
         className="mt-3 transition-transform duration-200 hover:-translate-y-0.5"
       >
-        {section.cta.label}
+        <EditableText path={[...path, 'cta', 'label']} value={section.cta.label} />
       </StoreButton>
     </div>
   );
@@ -110,4 +121,4 @@ export const HeroSection = memo(function HeroSection({ section }: { section: Her
       </div>
     </SectionShell>
   );
-});
+}, sectionPropsEqual);

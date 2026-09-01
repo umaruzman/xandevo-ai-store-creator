@@ -16,7 +16,7 @@ export const STEPS = [
   {
     n: '02',
     title: 'Generate',
-    body: 'A full storefront in seconds: palette and type tokens, hero, categories, eight priced products, About and Contact.',
+    body: 'In seconds: colours and fonts, a hero, category sections, eight priced products, and About & Contact pages.',
   },
   {
     n: '03',
@@ -27,19 +27,19 @@ export const STEPS = [
 
 export const CAPABILITIES = [
   {
-    title: 'Structured, never scraped',
-    body: 'The AI returns clean, validated data — never code or raw HTML. A safe renderer turns that data into the storefront, so nothing unexpected reaches the page.',
+    title: 'Designed around what you sell',
+    body: 'Colours, typography and layout are chosen to fit your product and your customer — not dropped in from a stock theme.',
   },
   {
-    title: 'Your choice of AI',
-    body: 'Generate with Anthropic, OpenAI or Gemini behind one interface. API keys stay on the server and never reach the browser.',
+    title: 'A catalogue to start from',
+    body: 'You get categories and priced sample products from the first generation, ready to rename, re-price and replace.',
   },
   {
-    title: 'Live preview, no refresh',
-    body: 'Colours, layouts and product grids repaint as you type — you are always editing the real storefront.',
+    title: 'Change anything, see it now',
+    body: 'Edit a headline, a colour or a price and the storefront updates in front of you. No rebuilds, no waiting.',
   },
   {
-    title: 'Saved and yours',
-    body: 'Every store, page and product is stored properly in a database, not as a blob. Reopen and keep editing any time.',
+    title: 'It stays yours',
+    body: 'Every store is saved to your account. Come back whenever you like to keep refining it.',
   },
 ] as const;

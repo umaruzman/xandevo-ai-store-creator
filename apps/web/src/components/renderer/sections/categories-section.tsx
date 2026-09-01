@@ -3,20 +3,25 @@
 import type { Section } from '@xandevo/shared';
 import { memo } from 'react';
 
+import { sectionPropsEqual } from './memo-compare';
+
+import type { Path } from '@/lib/set-path';
 import { cn } from '@/lib/utils';
 
+import { EditableText } from '../editable-text';
 import { placeholderImage } from '../placeholder-image';
 import { useRenderer } from '../renderer-context';
 import { CATEGORIES_LAYOUT, GRID_COLUMNS, pick } from '../recipes';
-import { Heading } from '../sf-ui';
 import { SectionShell } from './section-shell';
 
 type CategoriesSection = Extract<Section, { type: 'categories' }>;
 
 export const CategoriesSection = memo(function CategoriesSection({
   section,
+  path = [],
 }: {
   section: CategoriesSection;
+  path?: Path;
 }) {
   const { categoryById } = useRenderer();
   const categories = section.categoryIds
@@ -27,7 +32,9 @@ export const CategoriesSection = memo(function CategoriesSection({
 
   return (
     <SectionShell id={section.id} layout={section.layout}>
-      {section.title ? <Heading level={2}>{section.title}</Heading> : null}
+      {section.title ? (
+        <EditableText heading={2} path={[...path, 'title']} value={section.title} />
+      ) : null}
       <ul
         className={cn(
           pick(CATEGORIES_LAYOUT, section.categoriesLayout, 'grid'),
@@ -69,4 +76,4 @@ export const CategoriesSection = memo(function CategoriesSection({
       </ul>
     </SectionShell>
   );
-});
+}, sectionPropsEqual);

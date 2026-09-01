@@ -30,7 +30,15 @@ export function StorePreview({
   const promptText = useBuilderStore((s) => s.promptText);
   const promptVersion = useBuilderStore((s) => s.promptVersion);
   const markSaved = useBuilderStore((s) => s.markSaved);
+  const updateField = useBuilderStore((s) => s.updateField);
   const isDirty = useBuilderStore(selectIsDirty);
+
+  const onEditText = useCallback(
+    (path: readonly (string | number)[], value: string) => {
+      updateField(path, value);
+    },
+    [updateField],
+  );
 
   const [device, setDevice] = useState<Device>('desktop');
   const [pageSlug, setPageSlug] = useState('home');
@@ -50,7 +58,9 @@ export function StorePreview({
    *  switches the previewed page; anything else scrolls within the canvas. */
   const onCanvasClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
-      const anchor = (e.target as HTMLElement).closest('a');
+      const el = e.target as HTMLElement;
+      if (el.closest('[data-sf-editable]')) return; // clicking to edit, not to navigate
+      const anchor = el.closest('a');
       const href = anchor?.getAttribute('href');
       if (!href || !href.startsWith('#')) return;
       e.preventDefault();
@@ -164,7 +174,12 @@ export function StorePreview({
             device === 'mobile' ? 'max-w-[390px]' : 'max-w-[1200px]',
           )}
         >
-          <StoreRenderer definition={definition} pageSlug={pageSlug} />
+          <StoreRenderer
+            definition={definition}
+            pageSlug={pageSlug}
+            editable
+            onEditText={onEditText}
+          />
         </div>
       </div>
     </div>

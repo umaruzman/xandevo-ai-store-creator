@@ -1,8 +1,9 @@
 'use client';
 
 import type { Section, StoreDefinition } from '@xandevo/shared';
-import type { ComponentType } from 'react';
+import { useRef, type ComponentType } from 'react';
 
+import type { Path } from '@/lib/set-path';
 import { cn } from '@/lib/utils';
 
 import { AnnouncementBar } from './chrome/announcement-bar';
@@ -12,33 +13,55 @@ import { RendererProvider } from './renderer-context';
 import { SectionSlot } from './sections/section-registry';
 import { resolveThemeVars } from './theme-vars';
 
-type SectionComponent = ComponentType<{ section: never }>;
+type SectionComponent = ComponentType<{ section: never; path?: Path }>;
 
 /**
  * Pure `StoreDefinition -> JSX`. Sets `--sf-*` theme vars on the storefront root,
  * renders announcement bar + header + the given page's ordered sections + footer.
  * Unknown section types and enum values fall back safely (never throws). No
- * `dangerouslySetInnerHTML` anywhere.
+ * `dangerouslySetInnerHTML` anywhere. When `editable`, rendered text is editable
+ * in place and edits are reported through `onEditText(path, value)`.
  */
 export function StoreRenderer({
   definition,
   pageSlug = 'home',
   registry,
   className,
+  editable = false,
+  onEditText,
 }: {
   definition: StoreDefinition;
   pageSlug?: string;
   registry?: Partial<Record<string, SectionComponent>>;
   className?: string;
+  editable?: boolean;
+  onEditText?: (path: Path, value: string) => void;
 }) {
+  const pageIndex = definition.pages.findIndex((p) => p.slug === pageSlug);
   const page =
-    definition.pages.find((p) => p.slug === pageSlug) ??
-    [...definition.pages].sort((a, b) => a.order - b.order)[0];
+    pageIndex >= 0
+      ? definition.pages[pageIndex]
+      : [...definition.pages].sort((a, b) => a.order - b.order)[0];
+  const resolvedPageIndex = pageIndex >= 0 ? pageIndex : definition.pages.indexOf(page!);
 
-  const sections: Section[] = page ? [...page.sections].sort((a, b) => a.order - b.order) : [];
+  const ordered: Section[] = page ? [...page.sections].sort((a, b) => a.order - b.order) : [];
+
+  // Stable per-section edit path: keyed on the section object identity, so an
+  // unchanged section keeps the same `path` array across unrelated edits and its
+  // `React.memo` boundary holds. An edited section is a new object → new path.
+  const pathCache = useRef(new WeakMap<object, Path>());
+  const pathFor = (section: Section): Path => {
+    let p = pathCache.current.get(section);
+    if (!p) {
+      const storeIndex = page!.sections.findIndex((s) => s.id === section.id);
+      p = ['pages', resolvedPageIndex, 'sections', storeIndex] as const;
+      pathCache.current.set(section, p);
+    }
+    return p;
+  };
 
   return (
-    <RendererProvider definition={definition}>
+    <RendererProvider definition={definition} editEnabled={editable} onEditText={onEditText}>
       <div
         data-sf-root
         style={resolveThemeVars(definition.theme)}
@@ -55,8 +78,13 @@ export function StoreRenderer({
           navigation={definition.navigation}
         />
         <main>
-          {sections.map((section) => (
-            <SectionSlot key={section.id} section={section} registry={registry} />
+          {ordered.map((section) => (
+            <SectionSlot
+              key={section.id}
+              section={section}
+              path={pathFor(section)}
+              registry={registry}
+            />
           ))}
         </main>
         <SiteFooter storeName={definition.meta.name} footer={definition.footer} />

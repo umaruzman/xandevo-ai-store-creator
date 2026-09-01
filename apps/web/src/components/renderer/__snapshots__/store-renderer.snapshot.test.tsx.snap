@@ -83,7 +83,11 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
               class="inline-flex items-center justify-center rounded-[var(--sf-button-radius)] font-medium border border-[var(--sf-primary)] text-[var(--sf-primary)] h-12 px-7 text-base mt-3 transition-transform duration-200 hover:-translate-y-0.5"
               href="#home"
             >
-              Explore the collection
+              <span
+                class=""
+              >
+                Explore the collection
+              </span>
             </a>
           </div>
         </div>
@@ -299,7 +303,11 @@ exports[`StoreRenderer snapshot > matches the reference definition (home page) 1
             class="inline-flex items-center justify-center rounded-[var(--sf-button-radius)] font-medium transition-colors border border-[var(--sf-primary)] text-[var(--sf-primary)] h-10 px-5 text-sm"
             href="#home"
           >
-            Shop now
+            <span
+              class=""
+            >
+              Shop now
+            </span>
           </a>
         </div>
       </div>

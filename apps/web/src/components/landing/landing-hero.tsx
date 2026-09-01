@@ -16,8 +16,8 @@ export function LandingHero() {
             One sentence in. A real storefront out.
           </h1>
           <p className="lp-rise lp-rise-3 mt-5 max-w-md text-lg leading-relaxed text-[color:var(--lp-ink-soft)]">
-            Describe the shop you want. Xandevo writes the theme, hero, categories, priced products
-            and pages — editable, and saved to your account.
+            Describe the shop you want. Xandevo builds the whole storefront — the look, the words,
+            categories, priced products and every page — ready to edit and save.
           </p>
 
           <div className="lp-rise lp-rise-3 mt-8 flex flex-wrap items-center gap-3">
