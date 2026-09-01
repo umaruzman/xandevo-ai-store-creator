@@ -160,7 +160,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
   correct; state shape unchanged by edits (only values); zundo can be added without refactor
   (verified by a spike test or documented interface).
 
-## Phase 9 — Persistence & API Integration
+## Phase 9 — Persistence & API Integration  ✅ COMPLETE (2026-09-02)
 
 - **Objective:** save/load stores.
 - **Scope:** `StoresModule` (`POST /stores`, `GET /stores`, `GET /stores/:id`,
@@ -237,7 +237,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 | 6 | Prompt→Server-Action→builder-store→summary flow; `PromptForm` + `CreateStoreFlow` component tests; builder-store unit tests (load/reset/`selectIsDirty`); form a11y (label/hint/alert/status); pages stay RSC. TanStack Query deferred to Phase 9 |
 | 7 | All 6 sections + chrome render the reference definition; `pick()` unknown-enum fallback + `SectionSlot` unknown-type skip (no throw); `resolveThemeVars` maps tokens + 6-preset matrix distinct; injected `<script>` rendered as literal text (`querySelector('script')` null); memoization test — single hero-field edit re-renders hero (2), not categories (1); reference-definition snapshot |
 | 8 | `updateField`/`moveSection` tests (commit valid + structural sharing, reject invalid + record error, clear-on-fix, reorder+renumber); `setAtPath` clones only the path; `TextField` live-commit + invalid-held; `StoreEditor` integration — hero edit updates preview + dirty badge, reorder changes preview, contrast warning; `zundo` `temporal` undo/redo spike |
-| 9 | CRUD + ownership + validation integration tests on real PG; transactional write; reload == saved; e2e save/reload |
+| 9 | `stores.e2e-spec` on real PG: full loop (create→list→get-equal→patch→get-reflects→delete→404); user B → 404 on A's store (get/patch/delete) + not in B's list; 422 on invalid definition; mid-transaction failure rolls the aggregate back (0 rows); `Product.categoryId` RESTRICT (P2003). Web: `store-editor` Save POSTs `/api/stores` + `markSaved` clears dirty; TanStack Query hooks via BFF route handlers |
 | 10 | Security checklist + a11y + perf thresholds; CSP active |
 | 11 | Coverage thresholds; full e2e green; no skipped tests |
 | 12 | Docs match code; runbook dry-run; ADRs finalized; tagged |

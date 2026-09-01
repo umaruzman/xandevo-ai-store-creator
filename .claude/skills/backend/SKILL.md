@@ -67,13 +67,17 @@ guards/ dto/ domain/
   `product_grid_section_items`. Section content + all cross-entity refs are relational (FKs;
   structured link targets, no raw hrefs). `Store` = `meta` columns + `promptVersion` +
   `schemaVersion` + `theme`/`navigation` jsonb. No whole-definition JSON blob.
-- `StoresModule` owns the aggregate: repositories + `store-definition.mapper.ts`
-  (`toRows`/`toDefinition`, one branch per section type; round-trip identity).
-- Writes = validate definition → `toRows` → ONE transaction (upsert + diff + delete +
-  renumber `position`; one-field edit = one UPDATE). Reads = indexed joins → `toDefinition`
-  → `{ definition, ... }`.
-- All aggregate reads `userId`-scoped. Cascade from `User`; `Product.categoryId` RESTRICT;
-  `*_target_*_id` and `product_grid_sections.categoryId` SET NULL.
+- `StoresModule` (Phase 9): controller → `StoresService` → `StoresRepository` (ONE repo for
+  the whole aggregate, not per-table) + `store-definition.mapper.ts` (`toRows`/`toDefinition`).
+  `StoreOwnerGuard` on `/:id` → 404 (not 403) for missing/non-owned.
+- Writes = `validateStoreDefinition` (`@xandevo/shared`: schema→sanitize→schema→normalized
+  business rules; never trust the client `definition`) → `toRows` → ONE `prisma.$transaction`.
+  `PATCH .definition` currently FULL-replaces children (delete products→categories→pages,
+  then `createMany` in FK order); row-level minimal diff is a documented follow-up. Reads =
+  one nested `include` → `toDefinition` → `{ definition, ... }`; list = summaries only.
+- All queries `userId`-scoped (guard + service). Cascade from `User`; `Product.categoryId`
+  RESTRICT (replace deletes products first); `*_target_*_id` / `product_grid_sections.categoryId`
+  SET NULL.
 
 ## Testing
 

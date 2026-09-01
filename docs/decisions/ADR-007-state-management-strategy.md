@@ -23,10 +23,14 @@
   `savedHash` so a fresh generation is clean and only edits mark it dirty. Undo-readiness is
   asserted by a `zundo` `temporal(builderStateCreator)` spike test; the state creator is
   exported for that.
-- **Phase 9 — TanStack Query** is introduced for the first persisted reads (`GET /stores`,
-  `GET /stores/:id`) and mutations (`POST`/`PATCH /stores`), with query hooks + a
-  `QueryClientProvider`. The builder store is *hydrated from* a query result, never edited
-  inside the query cache.
+- **Phase 9 — TanStack Query** (`app/providers.tsx` `QueryClientProvider` in the root
+  layout): `lib/queries/stores.ts` hooks (`useStores`, `useStore`, `useCreateStore`,
+  `useUpdateStore`) call **BFF route handlers** at `app/api/stores/*` (same-origin, session
+  cookie), which proxy to the Nest API via the server-only JWT-minting `apiFetch`. RSC reads
+  (`dashboard`, `/stores/[storeId]`) call `apiClient` directly. On save: create → `markSaved`
+  + `router.push('/stores/[id]')`; update → `markSaved`; both invalidate `['stores']`. The
+  builder store is *hydrated from* a server result (`loadFromServer`), never edited inside
+  the query cache.
 
 ## Context
 

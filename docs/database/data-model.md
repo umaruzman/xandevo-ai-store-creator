@@ -131,10 +131,12 @@ enum(`photo`|`illustration`|`pattern`|`mono`), `featured` bool default false,
 
 ## 5. Write / read flow
 
-- **Write** (`POST`/`PATCH /stores`): validate Store Definition (full pipeline) →
-  `mapper.toRows` → **one transaction**: upsert `Store` (incl. `theme`/`navigation` jsonb),
-  diff-upsert `Page` / `Section` / `<type>_sections` / `Category` / `Product` and the two
-  `*_section_items` join tables, delete removed rows, renumber `position`.
+- **Write** (`POST`/`PATCH /stores`, Phase 9): validate Store Definition (full pipeline) →
+  `mapper.toRows` → **one `prisma.$transaction`**. Create inserts `Store` then children in FK
+  order. `PATCH .definition` currently deletes the children (products → categories →
+  pages+cascade) and re-`createMany`s them — a full child replace; stores are small and the
+  mapper already emits minimal diffs, so row-level minimal application is a documented
+  follow-up optimisation.
 - **Read** (`GET /stores/:id`): bounded indexed joins for the aggregate → `mapper.toDefinition`
   → return `{ definition, ... }` on the wire.
 - Wire format stays the Store Definition; normalization is internal.

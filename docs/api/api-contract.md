@@ -3,9 +3,11 @@
 Base URL: `${NEXT_PUBLIC_API_URL}` (e.g. `http://localhost:4000`). All routes are JSON.
 Auth: `Authorization: Bearer <jwt>` unless noted.
 
-**Implemented so far:** `GET /health`, `GET /ready` (Phase 2/3), `GET /me` (Phase 4),
-`POST /generate` (Phase 5). `/stores*` land in Phase 9. Every response carries an
-`x-request-id` header (echoed as `error.requestId`).
+**Implemented:** `GET /health`, `GET /ready` (Phase 2/3), `GET /me` (Phase 4),
+`POST /generate` (Phase 5), and full `/stores` CRUD (Phase 9). Every response carries an
+`x-request-id` header (echoed as `error.requestId`). The web app calls these server-side
+(RSC / Server Actions / BFF route handlers under `app/api/*`); the browser never holds the
+API JWT, so the API has CORS off.
 
 ## Conventions
 
@@ -48,10 +50,10 @@ Types below reference schemas in `packages/shared`.
 
 ---
 
-## POST /stores
+## POST /stores  *(implemented — Phase 9)*
 
 - **Purpose:** create and save a store.
-- **Auth:** required. **Body limit:** 128 KB.
+- **Auth:** required. **Body limit:** 256 KB (global). Create is rate-limited 30/min, patch 60/min.
 - **Request DTO:**
   ```
   { "name": string (1..80),
@@ -67,7 +69,7 @@ Types below reference schemas in `packages/shared`.
 
 ---
 
-## GET /stores
+## GET /stores  *(implemented — Phase 9)*
 
 - **Purpose:** list the current user's stores (summaries).
 - **Auth:** required.
@@ -79,7 +81,7 @@ Types below reference schemas in `packages/shared`.
 
 ---
 
-## GET /stores/:id
+## GET /stores/:id  *(implemented — Phase 9)*
 
 - **Purpose:** full store for the builder.
 - **Auth:** required. **Authorization:** owner only.
@@ -88,20 +90,20 @@ Types below reference schemas in `packages/shared`.
 
 ---
 
-## PATCH /stores/:id
+## PATCH /stores/:id  *(implemented — Phase 9)*
 
 - **Purpose:** save edits from the editor.
-- **Auth:** required. **Authorization:** owner only. **Body limit:** 128 KB.
+- **Auth:** required. **Authorization:** owner only. **Body limit:** 256 KB (global). Create is rate-limited 30/min, patch 60/min.
 - **Request DTO (all optional, ≥1 required):**
   `{ "name"?: string (1..80), "definition"?: StoreDefinition, "status"?: "draft" | "saved" }`
 - **Validation:** if `definition` present, full pipeline re-run; `schemaVersion` must be
   supported (older versions migrated forward, rejected if unmigratable → 409 SCHEMA_UNSUPPORTED).
 - **Response 200:** updated `Store`.
-- **Errors:** 400, 401, 404, 409 SCHEMA_UNSUPPORTED, 422.
+- **Errors:** 400, 401, 404 STORE_NOT_FOUND, 422 (definition invalid).
 
 ---
 
-## DELETE /stores/:id
+## DELETE /stores/:id  *(implemented — Phase 9)*
 
 - **Purpose:** delete a store.
 - **Auth:** required. **Authorization:** owner only.

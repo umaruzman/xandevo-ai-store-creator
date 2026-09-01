@@ -2,13 +2,12 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 8 (Dynamic Editor) complete.**
-> Monorepo + CI; Store Definition schema/pipeline/model/mapper; Google auth; `POST /generate`;
-> the create-store flow; a schema-driven live preview; and now an **inline editor** —
-> `/stores/new` is a split editor ‖ preview: edit the name, theme colours (with an AA
-> contrast warning), hero copy/layout, category & product fields, About/Contact text, and
-> reorder sections; every edit is schema-validated and the preview updates live with a
-> dirty indicator. Not built: saving. Next: **Phase 9 — Persistence & API Integration**.
+> **Status: Phase 9 (Persistence & API Integration) complete.**
+> The full loop works: sign in → generate → edit in the split editor ‖ preview → **Save**.
+> Stores persist to Postgres (normalized aggregate, transactional write, server-side
+> re-validation), list on the dashboard, and reopen at `/stores/[id]` to keep editing.
+> API: `/health`, `/ready`, `/me`, `POST /generate`, full `/stores` CRUD.
+> Next: **Phase 10 — UI/UX, Security & Performance** (landing page, CSP, a11y/perf).
 
 ## Overview
 
@@ -143,12 +142,11 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phases 1–8 complete. Foundation + Store Definition schema/pipeline/model/mapper + Google
-auth + AI generation engine + create-store UX + schema-driven live preview + inline editor
-(`components/editor/*`, validated `updateField` on the Zustand builder store). API:
-`/health`, `/ready`, `/me`, `POST /generate`. Set `AI_PROVIDER=fake` in `apps/api/.env` to
-generate without an Anthropic key. Decisions log: `docs/decisions/OPEN-QUESTIONS.md`.
-Next: **Phase 9 — Persistence & API Integration**.
+Phases 1–9 complete — the MVP loop is end to end: generate → edit → save → reload. API:
+`/health`, `/ready`, `/me`, `POST /generate`, full `/stores` CRUD (normalized transactional
+persistence). Set `AI_PROVIDER=fake` in `apps/api/.env` to generate without an Anthropic
+key. Decisions log: `docs/decisions/OPEN-QUESTIONS.md`.
+Next: **Phase 10 — UI/UX, Security & Performance**.
 
 ## Future roadmap
 

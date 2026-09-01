@@ -14,12 +14,19 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 8 — Dynamic Editor. COMPLETE.** Next: **Phase 9 — Persistence & API Integration**
-(`StoresModule` CRUD with `StoreOwnerGuard` + the definition⇄rows mapper wired
-transactionally; web: TanStack Query + `QueryClientProvider`, create/update mutations, Save,
-reopen a store into the builder). Save/persistence still prohibited until this phase.
+**Phase 9 — Persistence & API Integration. COMPLETE.** Next: **Phase 10 — UI/UX, Security &
+Performance** (real landing page, dashboard/builder polish, loading/error boundaries, CSP +
+Helmet + CORS lockdown, rate-limit tuning, a11y + perf pass). No new features.
 
 What exists now:
+- **Persistence (Phase 9):** `apps/api` `StoresModule` — `POST/GET/PATCH/DELETE /stores`,
+  `StoreOwnerGuard` (404 not 403), `StoresService` (`validateStoreDefinition` server-side
+  re-check), `StoresRepository` (one aggregate repo; `prisma.$transaction`; `PATCH .definition`
+  = full child replace, delete products→categories→pages then `createMany`; `toDefinition` on
+  read). `apps/web`: `app/providers.tsx` (`QueryClientProvider`), `lib/queries/stores.ts`
+  hooks → BFF route handlers `app/api/stores/*` → `apiClient` (server-only `apiFetch`).
+  `/stores/[storeId]` RSC → `StoreEditorLoader` (`loadFromServer`). Dashboard lists stores.
+  Save in `StorePreview` → create (`router.push('/stores/[id]')`) or update → `markSaved`.
 - **Editor (Phase 8):** builder store `updateField(path, value)` — `setAtPath` (structural
   sharing) → whole-schema `safeParse` → commit candidate on pass else record
   `editErrors[pathKey]`; `moveSection` reorders+renumbers via `updateField`; `setGenerated`
@@ -68,9 +75,10 @@ What exists now:
 - Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
   `AI_PROVIDER=fake` runs generation with no API key (dev/CI).
 
-Still prohibited until their phase: store repositories / persistence endpoints + **save** +
-TanStack Query (`POST/GET/PATCH /stores`, Phase 9). A real landing page is Phase 10 (the
-current `app/page.tsx` is a placeholder). See `docs/development/roadmap.md`.
+Phase 10 introduces the real landing page + CSP/Helmet/CORS lockdown + a11y/perf pass; the
+current `app/page.tsx` is still a placeholder and CORS is off. Not yet built (post-MVP,
+documented in `api-contract.md`): regenerate-into-store, version history, media upload,
+public storefronts. See `docs/development/roadmap.md`.
 
 ## Technology stack
 

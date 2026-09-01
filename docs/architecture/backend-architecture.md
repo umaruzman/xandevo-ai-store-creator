@@ -131,12 +131,22 @@ return `StoreDefinition`. Never persists. Never returns partial/unvalidated data
   storeId)` and `toDefinition(rows)` over plain DB-shaped row types (no Prisma coupling, no
   timestamps). Round-trip is identity after normalization (tested), and a one-field edit
   produces a minimal row diff (tested).
-- Writes (`POST`/`PATCH /stores`): validate definition → `toRows` → **single transaction**
-  upserting `Store` and diff-upserting children, deleting removed rows, renumbering `order`.
-- Reads (`GET /stores/:id`): bounded indexed queries for the aggregate → `toDefinition` →
-  return `{ definition, ... }` on the wire.
-- Every repository read is `userId`-scoped (via the parent `Store`). `Product.categoryId`
-  is `ON DELETE RESTRICT`; the rest cascade from `User`.
+- **`StoresModule` (Phase 9):** thin controller → `StoresService` → `StoresRepository` (one
+  repository for the whole Store aggregate — not one class per table; it owns the
+  transactional multi-table writes). `StoreOwnerGuard` on `/:id` routes 404s (not 403s) for
+  missing / non-owned. Every repo query is `userId`-scoped; the guard + service both check.
+- Writes (`POST`/`PATCH /stores`): `validateStoreDefinition` (`@xandevo/shared` — schema →
+  sanitize → schema → normalized business rules; client `definition` never trusted) →
+  `toRows` → **one `prisma.$transaction`**. `PATCH .definition` currently **fully replaces
+  the children** (delete products → categories → pages+cascade, then `createMany` in FK
+  order); stores are small (≤ ~200 rows) and the mapper already emits minimal diffs — applying
+  them row-by-row is a documented follow-up. On any error the whole transaction rolls back
+  (tested).
+- Reads (`GET /stores/:id`): one nested `include` query → assemble `StoreAggregateRows` →
+  `toDefinition` → `{ definition, … }`. `GET /stores` returns summaries only (cursor
+  paginated, no `definition`).
+- `Product.categoryId` is `ON DELETE RESTRICT` (tested at the DB level); the rest cascade
+  from `User`. The replace order deletes products before categories to respect it.
 
 ## 9. Validation, security, limits
 
