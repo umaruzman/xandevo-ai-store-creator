@@ -16,6 +16,13 @@
 - **Phase 6 — generation is a Server Action** (`useActionState`), not a TanStack Query
   mutation: it needs the server-only JWT-minting `apiFetch`, and there is no cache to
   invalidate yet. The action result is pushed into the builder store via `useEffect`.
+- **Phase 8 — `updateField(path, value)`** on the builder store is the single edit entry
+  point: `setAtPath` (structural sharing) → whole-schema `safeParse` of the candidate →
+  commit the *candidate* on success (not `parsed.data`), else record `editErrors` and leave
+  `definition` unchanged. `moveSection` routes through it. `setGenerated` now stamps
+  `savedHash` so a fresh generation is clean and only edits mark it dirty. Undo-readiness is
+  asserted by a `zundo` `temporal(builderStateCreator)` spike test; the state creator is
+  exported for that.
 - **Phase 9 — TanStack Query** is introduced for the first persisted reads (`GET /stores`,
   `GET /stores/:id`) and mutations (`POST`/`PATCH /stores`), with query hooks + a
   `QueryClientProvider`. The builder store is *hydrated from* a query result, never edited

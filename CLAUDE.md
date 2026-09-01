@@ -14,11 +14,20 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 7 — Store Renderer & Live Preview. COMPLETE.** Next: **Phase 8 — Dynamic Editor**
-(inline edit of hero/theme/text fields via a validated `updateField(path, value)` on the
-builder store; preview updates live; dirty state; no save/API yet).
+**Phase 8 — Dynamic Editor. COMPLETE.** Next: **Phase 9 — Persistence & API Integration**
+(`StoresModule` CRUD with `StoreOwnerGuard` + the definition⇄rows mapper wired
+transactionally; web: TanStack Query + `QueryClientProvider`, create/update mutations, Save,
+reopen a store into the builder). Save/persistence still prohibited until this phase.
 
 What exists now:
+- **Editor (Phase 8):** builder store `updateField(path, value)` — `setAtPath` (structural
+  sharing) → whole-schema `safeParse` → commit candidate on pass else record
+  `editErrors[pathKey]`; `moveSection` reorders+renumbers via `updateField`; `setGenerated`
+  stamps `savedHash` (fresh gen = clean). `components/editor/*` — `useField` codec hook,
+  `TextField`/`ColorField`/`PriceField`/`SelectField`, `EditorPanel` (store/theme+contrast/
+  hero/section-order/catalogue/pages). `components/builder/store-editor.tsx` = split
+  `EditorPanel ‖ StorePreview`; `selectIsDirty` → "Unsaved changes" badge. Undo-ready
+  (`zundo` `temporal(builderStateCreator)` spike test). `lib/set-path.ts`, `lib/contrast.ts`.
 - **Renderer (Phase 7):** `components/renderer/*` — pure `<StoreRenderer definition>`:
   `resolveThemeVars` → `--sf-*` CSS vars on `[data-sf-root]`; `SECTION_REGISTRY` +
   `<SectionSlot>` (unknown type → skip, no throw); `recipes.ts` (`pick(map,key,fallback)`);
@@ -59,10 +68,9 @@ What exists now:
 - Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
   `AI_PROVIDER=fake` runs generation with no API key (dev/CI).
 
-Still prohibited until their phase: the dynamic **editor** / `updateField` (Phase 8), store
-repositories / persistence endpoints + **save** + TanStack Query (`POST/GET/PATCH /stores`,
-Phase 9). A real landing page is Phase 10 (the current `app/page.tsx` is a placeholder).
-See `docs/development/roadmap.md`.
+Still prohibited until their phase: store repositories / persistence endpoints + **save** +
+TanStack Query (`POST/GET/PATCH /stores`, Phase 9). A real landing page is Phase 10 (the
+current `app/page.tsx` is a placeholder). See `docs/development/roadmap.md`.
 
 ## Technology stack
 

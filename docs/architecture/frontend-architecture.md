@@ -157,14 +157,27 @@ components/
 - Style isolation is via `--sf-` prefixed vars + a `[data-sf-root]` scope; an iframe is a
   possible Phase 10 hardening.
 
-## 10. Editor architecture
+## 10. Editor architecture  *(implemented — Phase 8, `apps/web/src/components/editor/`)*
 
-- Editor edits **structured data**, never the DOM. Each field component receives a value +
-  an `onChange` that calls `updateField(path, value)`.
-- MVP editable: hero headline/description/CTA text, theme colors, category names, product
-  name/description/price, About/Contact text, section order (drag within page).
-- Optimistic UI: edits apply to Zustand immediately; Save persists. On save failure, keep
-  local state, show retry (no rollback needed since nothing was optimistically sent to peers).
+- Edits **structured data**, never the DOM. `updateField(path: (string|number)[], value)` on
+  the builder store: `setAtPath` (structural sharing — only the touched spine gets new
+  identity) → `storeDefinitionSchema.safeParse(candidate)` → **commit `candidate` only if it
+  passes** (never `parsed.data`, which would break memoization), else record
+  `editErrors[pathKey(path)]` and leave `definition` untouched. Returns `{ ok, error? }`.
+  `moveSection(pageId, sectionId, dir)` reorders + renumbers `order`, then routes through
+  `updateField` for validation.
+- Fields (`components/editor/fields/*`): `useField(path, codec)` gives local input state that
+  commits valid edits live and keeps an invalid value on-screen with the rejection message.
+  `TextField` / `ColorField` (+ `<input type=color>` and contrast check) / `PriceField`
+  (major units ⇄ minor) / `SelectField` (enums).
+- `EditorPanel` groups: Store, Theme (preset + 5 colours + AA contrast warning), Hero
+  (layout + copy), Home layout (section up/down), Categories, Products (name/desc/price),
+  About/Contact text. `StoreEditor` = split `EditorPanel` ‖ `StorePreview` (both read the
+  same store → preview updates live; `selectIsDirty` drives the "Unsaved changes" badge).
+- **Undo-ready:** every edit is a pure `set({ definition, editErrors })` with a fresh
+  immutable object. Verified by a `zundo` `temporal(builderStateCreator)` spike test
+  (undo/redo of `updateField`); production store is unwrapped until undo/redo ships.
+- Save/persistence is Phase 9.
 
 ## 11. Responsive & accessibility
 

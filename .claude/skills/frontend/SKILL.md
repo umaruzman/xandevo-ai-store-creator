@@ -60,14 +60,20 @@ Full detail: `docs/architecture/frontend-architecture.md`. This is the checklist
   Images: `placeholderImage(seed, name)` inline SVG data URI + `<img alt>` (no `next/image`
   until real uploads). Semantic landmarks; storefront `<StorePreview>` is builder chrome.
 
-## Editor
+## Editor  (`components/editor/*`, Phase 8)
 
-- Edits structured data only — never the DOM. Field components: value + `onChange` →
-  `updateField`.
-- MVP editable: hero text/CTA, theme colors, category names, product name/desc/price,
-  About/Contact text, section order.
-- Optimistic local updates; Save persists via mutation; on failure keep local state + retry.
-- Warn on low text/background contrast.
+- Edits structured data only — never the DOM. `updateField(path, value)` on the builder
+  store: `setAtPath` (structural sharing) → `storeDefinitionSchema.safeParse(candidate)` →
+  commit the **candidate** on pass (not `parsed.data`), else record `editErrors[pathKey]`
+  and leave `definition` unchanged. `moveSection` routes through `updateField`.
+- `useField(path, codec)` — local input state; commits valid edits live, holds an invalid
+  value on-screen with the store's message. `TextField` / `ColorField` (contrast check) /
+  `PriceField` (major⇄minor) / `SelectField` (enums).
+- `EditorPanel` (groups) ‖ `StorePreview` = `StoreEditor`; both read the store → live
+  preview. `selectIsDirty` drives the "Unsaved changes" badge (`setGenerated` stamps
+  `savedHash` so a fresh generation is clean).
+- Undo-ready: every edit is a pure `set({ definition, editErrors })`; `builderStateCreator`
+  is exported and wraps in `zundo` `temporal` with no refactor (spike-tested). Save is Phase 9.
 
 ## Tailwind / shadcn
 

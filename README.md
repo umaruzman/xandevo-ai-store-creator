@@ -2,12 +2,13 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 7 (Store Renderer & Live Preview) complete.**
+> **Status: Phase 8 (Dynamic Editor) complete.**
 > Monorepo + CI; Store Definition schema/pipeline/model/mapper; Google auth; `POST /generate`;
-> the create-store flow; and now a **schema-driven live preview** — the generated definition
-> renders as a real storefront (theme → CSS variables, per-enum variant recipes, section
-> registry, device toggle) inside `/stores/new`, re-rendering from the builder store.
-> Not built: inline editing, saving. Next: **Phase 8 — Dynamic Editor**.
+> the create-store flow; a schema-driven live preview; and now an **inline editor** —
+> `/stores/new` is a split editor ‖ preview: edit the name, theme colours (with an AA
+> contrast warning), hero copy/layout, category & product fields, About/Contact text, and
+> reorder sections; every edit is schema-validated and the preview updates live with a
+> dirty indicator. Not built: saving. Next: **Phase 9 — Persistence & API Integration**.
 
 ## Overview
 
@@ -142,11 +143,12 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phases 1–7 complete. Foundation + Store Definition schema/pipeline/model/mapper + Google
-auth + AI generation engine + the create-store UX + a schema-driven live preview
-(`components/renderer/*`). API: `/health`, `/ready`, `/me`, `POST /generate`. Set
-`AI_PROVIDER=fake` in `apps/api/.env` to generate without an Anthropic key. Decisions log:
-`docs/decisions/OPEN-QUESTIONS.md`. Next: **Phase 8 — Dynamic Editor**.
+Phases 1–8 complete. Foundation + Store Definition schema/pipeline/model/mapper + Google
+auth + AI generation engine + create-store UX + schema-driven live preview + inline editor
+(`components/editor/*`, validated `updateField` on the Zustand builder store). API:
+`/health`, `/ready`, `/me`, `POST /generate`. Set `AI_PROVIDER=fake` in `apps/api/.env` to
+generate without an Anthropic key. Decisions log: `docs/decisions/OPEN-QUESTIONS.md`.
+Next: **Phase 9 — Persistence & API Integration**.
 
 ## Future roadmap
 
