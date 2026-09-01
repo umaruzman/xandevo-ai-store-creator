@@ -14,17 +14,23 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 6 — Dashboard & Store Creation UX. COMPLETE.** Next: **Phase 7 — Store Renderer &
-Live Preview** (`<StoreRenderer>` + `SECTION_REGISTRY`, theme via CSS vars, variant recipes,
-instant re-render from the builder store; no editor/save).
+**Phase 7 — Store Renderer & Live Preview. COMPLETE.** Next: **Phase 8 — Dynamic Editor**
+(inline edit of hero/theme/text fields via a validated `updateField(path, value)` on the
+builder store; preview updates live; dirty state; no save/API yet).
 
 What exists now:
+- **Renderer (Phase 7):** `components/renderer/*` — pure `<StoreRenderer definition>`:
+  `resolveThemeVars` → `--sf-*` CSS vars on `[data-sf-root]`; `SECTION_REGISTRY` +
+  `<SectionSlot>` (unknown type → skip, no throw); `recipes.ts` (`pick(map,key,fallback)`);
+  `renderer-context` memoized on `[theme,categories,products]` for `React.memo` section
+  isolation; `placeholder-image` (inline SVG data URI). `components/builder/store-preview.tsx`
+  (device toggle + canvas, reads the builder store) replaced `<GeneratedSummary>` in
+  `<CreateStoreFlow>`.
 - **Web builder (Phase 6):** `lib/store/builder.ts` (Zustand — the one working `definition`,
   `generation` status, `selectIsDirty` via `lib/hash.ts`); `(dashboard)/stores/new` RSC →
-  `<CreateStoreFlow>` (client) → `PromptForm` → **Server Action `generateStoreAction`** →
-  `lib/api-client.ts#generateStore` (over server-only `apiFetch`) → `setGenerated` →
-  `<GeneratedSummary>`. `middleware.ts` gates `/dashboard/*` + `/stores/*`. TanStack Query
-  is Phase 9 (no persisted reads yet).
+  `<CreateStoreFlow>` → `PromptForm` → Server Action `generateStoreAction` →
+  `lib/api-client.ts#generateStore` (server-only `apiFetch`) → `setGenerated`. `middleware.ts`
+  gates `/dashboard/*` + `/stores/*`. TanStack Query is Phase 9.
 - **AI generation (Phase 5):** `AiModule` (`AiProvider` interface + `AI_PROVIDER` token,
   factory on `AI_PROVIDER` env); providers under `src/ai/providers/` only —
   `AnthropicProvider` (default, `emit_store_definition` tool) + `FakeAiProvider`
@@ -53,10 +59,10 @@ What exists now:
 - Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
   `AI_PROVIDER=fake` runs generation with no API key (dev/CI).
 
-Still prohibited until their phase: store **renderer** / live preview (Phase 7), dynamic
-**editor** (Phase 8), store repositories / persistence endpoints + **save** + TanStack Query
-(`POST/GET/PATCH /stores`, Phase 9). A real landing page is Phase 10 (the current
-`app/page.tsx` is a placeholder). See `docs/development/roadmap.md`.
+Still prohibited until their phase: the dynamic **editor** / `updateField` (Phase 8), store
+repositories / persistence endpoints + **save** + TanStack Query (`POST/GET/PATCH /stores`,
+Phase 9). A real landing page is Phase 10 (the current `app/page.tsx` is a placeholder).
+See `docs/development/roadmap.md`.
 
 ## Technology stack
 

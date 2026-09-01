@@ -141,15 +141,21 @@ components/
   only ever selects a key; it never supplies classes or raw CSS. Unknown key → documented
   default. ~2–5 keys per axis (see `docs/architecture/store-definition.md` §2).
 
-## 9. Store preview architecture
+## 9. Store preview architecture  *(implemented — Phase 7)*
 
-- `<StoreRenderer definition={def} />` — maps `definition.pages[].sections[]` to a registry
-  of section components (`SECTION_REGISTRY[type]`).
-- Unknown section type → render nothing + dev warning (fail safe, never throw in preview).
-- Renders inside a scrollable, responsive container; a device-width toggle (mobile/desktop)
-  is a wrapper, not per-component logic.
-- No `dangerouslySetInnerHTML`. All text rendered as text. Images use `next/image` with an
-  allowlisted placeholder host / data-URI strategy (see store-definition doc).
+- `components/renderer/*` — `<StoreRenderer>` (registry + chrome), `renderer-context`,
+  `recipes.ts`, `theme-vars.ts`, `placeholder-image.ts`, `sections/*`, `chrome/*`.
+  Pure `StoreDefinition -> JSX`; details in `docs/architecture/store-definition.md` §4.
+- `components/builder/store-preview.tsx` — builder chrome: a toolbar (store name, device
+  toggle, Start over, disabled Save) + `<StoreRenderer>` in a scrollable bordered canvas.
+  Reads the working `definition` from the Zustand builder store, so it re-renders live as
+  state changes (the editor lands in Phase 8). It replaces the Phase-6 summary in
+  `<CreateStoreFlow>`.
+- Unknown section type / enum value → safe fallback, never throws. No
+  `dangerouslySetInnerHTML`. Placeholder images are inline SVG data URIs (`<img alt>`);
+  `next/image` is deferred until real uploads (Phase 10+).
+- Style isolation is via `--sf-` prefixed vars + a `[data-sf-root]` scope; an iframe is a
+  possible Phase 10 hardening.
 
 ## 10. Editor architecture
 

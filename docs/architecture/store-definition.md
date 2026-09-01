@@ -146,12 +146,23 @@ parse → schema → `assertBusinessRules` → `sanitizeStoreDefinitionInput` �
 
 Output of all four layers = a **trusted** Store Definition.
 
-## 4. Renderer mapping
+## 4. Renderer mapping  *(implemented — Phase 7, `apps/web/src/components/renderer/`)*
 
-`SECTION_REGISTRY: Record<SectionType, React.ComponentType<SectionProps>>`. The renderer
-walks `page.sections` sorted by `order` and renders `SECTION_REGISTRY[section.type]`.
-Theme is applied by setting CSS custom properties from `theme` on the renderer root.
-Products/categories are resolved by id from the top-level arrays.
+- `<StoreRenderer definition pageSlug="home" />` — pure `StoreDefinition -> JSX`. Renders
+  `AnnouncementBar?` + `SiteHeader` + the page's `sections` sorted by `order` + `SiteFooter`.
+- `SECTION_REGISTRY: Record<Section['type'], Component>`; `<SectionSlot>` looks it up.
+  Unknown `type` → renders nothing + dev `console.warn`, never throws. An optional `registry`
+  prop allows overrides (tests).
+- **Theme → CSS custom properties.** `resolveThemeVars(theme)` maps the normalized tokens to
+  `--sf-*` vars set on the storefront root (`[data-sf-root]`). Section components style
+  themselves only through those vars + Tailwind utilities — never arbitrary CSS.
+- **Variant recipes** (`recipes.ts`): each style enum → a fixed Tailwind class string;
+  `pick(map, key, fallback)` returns a documented default for any unrecognised value.
+- Catalogue + `href` resolution live in `RendererProvider` context, memoized on
+  `[theme, categories, products]` so a single-section content edit leaves the context
+  identical and only that `React.memo`'d section re-renders.
+- Images: `placeholderImage(seed, name)` → an inline SVG data URI (offline, no scripts).
+  No `dangerouslySetInnerHTML` anywhere; `richText.body` is split on blank lines into `<p>`s.
 
 ## 5. Extensibility — adding a new section type
 

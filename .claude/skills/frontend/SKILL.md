@@ -43,19 +43,22 @@ Full detail: `docs/architecture/frontend-architecture.md`. This is the checklist
 - `react-hook-form` + `zodResolver`, schemas from `packages/shared`. Client validation is UX
   only; the API re-validates.
 
-## Store Renderer
+## Store Renderer  (`components/renderer/*`, Phase 7)
 
-- Pure `definition -> JSX`. Map `section.type` via `SECTION_REGISTRY`. Unknown type →
-  render nothing + dev warn, never throw. Also render `header`, `footer`, `announcementBar`.
-- Theme: resolve `theme.preset` defaults → overlay explicit token overrides → set CSS
-  custom properties on the renderer root.
-- **Style variation is enum-keyed.** Every style value (`theme.components.*`, section
-  `layout.*`, `hero.heroLayout`, `productGrid.columns`, …) resolves through a `recipes/`
-  lookup to a fixed class/var set. Never accept classes or raw CSS from the definition.
-  Unknown enum key → documented default, never throw.
-- **No `dangerouslySetInnerHTML`** on any generated content. Text renders as text.
-- `next/image` with required `alt`; only allowlisted remote hosts.
-- Semantic landmarks (`header`/`main`/`section`/`footer`); keyboard-reachable controls.
+- Pure `<StoreRenderer definition pageSlug? registry? />`. `SECTION_REGISTRY` +
+  `<SectionSlot>`: unknown `type` → skip + dev `console.warn`, never throw. Renders
+  `AnnouncementBar? + SiteHeader + <main> sections + SiteFooter`.
+- Theme: `resolveThemeVars(theme)` (already fully normalized) → `--sf-*` CSS custom
+  properties on `[data-sf-root]`. Section components style only via those vars + Tailwind.
+- **Style variation is enum-keyed.** `recipes.ts`: every style value resolves through
+  `pick(map, key, fallback)` → fixed class string; unknown key → documented default.
+  Never accept classes or raw CSS from the definition.
+- Catalogue/`href` lookups via `RendererProvider` context, memoized on
+  `[theme, categories, products]` (NOT the whole `definition`) so `React.memo`'d sections
+  isolate: a single-section content edit re-renders only that section.
+- **No `dangerouslySetInnerHTML`.** `richText.body` → split on blank lines into `<p>`.
+  Images: `placeholderImage(seed, name)` inline SVG data URI + `<img alt>` (no `next/image`
+  until real uploads). Semantic landmarks; storefront `<StorePreview>` is builder chrome.
 
 ## Editor
 

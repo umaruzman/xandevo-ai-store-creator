@@ -2,12 +2,12 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 6 (Dashboard & Store Creation UX) complete.**
+> **Status: Phase 7 (Store Renderer & Live Preview) complete.**
 > Monorepo + CI; Store Definition schema/pipeline/model/mapper; Google auth; `POST /generate`;
-> and now the **create-store flow** — sign in → dashboard → `/stores/new` → describe a store
-> → Server Action calls `/generate` → the generated definition lands in a Zustand builder
-> store and a summary renders. Not built: live preview, inline editing, saving.
-> Next: **Phase 7 — Store Renderer & Live Preview**.
+> the create-store flow; and now a **schema-driven live preview** — the generated definition
+> renders as a real storefront (theme → CSS variables, per-enum variant recipes, section
+> registry, device toggle) inside `/stores/new`, re-rendering from the builder store.
+> Not built: inline editing, saving. Next: **Phase 8 — Dynamic Editor**.
 
 ## Overview
 
@@ -142,11 +142,11 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phases 1–6 complete. Foundation + Store Definition schema/pipeline/model/mapper + Google
-auth + AI generation engine + the create-store UX (prompt → Server Action → `/generate` →
-Zustand builder store → summary). API: `/health`, `/ready`, `/me`, `POST /generate`. Set
+Phases 1–7 complete. Foundation + Store Definition schema/pipeline/model/mapper + Google
+auth + AI generation engine + the create-store UX + a schema-driven live preview
+(`components/renderer/*`). API: `/health`, `/ready`, `/me`, `POST /generate`. Set
 `AI_PROVIDER=fake` in `apps/api/.env` to generate without an Anthropic key. Decisions log:
-`docs/decisions/OPEN-QUESTIONS.md`. Next: **Phase 7 — Store Renderer & Live Preview**.
+`docs/decisions/OPEN-QUESTIONS.md`. Next: **Phase 8 — Dynamic Editor**.
 
 ## Future roadmap
 

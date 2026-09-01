@@ -126,7 +126,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 - **Gate:** component tests for prompt form + status; builder store unit tests (load/reset/
   dirty selector); a11y checks on the form; no client component where a server one suffices.
 
-## Phase 7 — Store Renderer & Live Preview
+## Phase 7 — Store Renderer & Live Preview  ✅ COMPLETE (2026-09-02)
 
 - **Objective:** schema-driven renderer with instant preview.
 - **Scope:** `<StoreRenderer>` + `SECTION_REGISTRY` (Hero, Categories, ProductGrid, RichText,
@@ -235,7 +235,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 | 4 | API 401s (no token / bad sig / wrong iss·aud / expired) + `/me` provisions & returns; middleware redirects `/dashboard`; sign-in/out buttons wired. Browser Google e2e → Phase 11 |
 | 5 | `/generate` pipeline tested with Fake + scripted providers (valid / retry / exhausted / schema-invalid / business-invalid / injection); Anthropic contract test vs recorded fixture; e2e 200·400·401·429 + no secret in body; ESLint blocks vendor SDK imports outside `src/ai/providers/` |
 | 6 | Prompt→Server-Action→builder-store→summary flow; `PromptForm` + `CreateStoreFlow` component tests; builder-store unit tests (load/reset/`selectIsDirty`); form a11y (label/hint/alert/status); pages stay RSC. TanStack Query deferred to Phase 9 |
-| 7 | Every section renders; theme via CSS vars; no raw HTML; memoization verified |
+| 7 | All 6 sections + chrome render the reference definition; `pick()` unknown-enum fallback + `SectionSlot` unknown-type skip (no throw); `resolveThemeVars` maps tokens + 6-preset matrix distinct; injected `<script>` rendered as literal text (`querySelector('script')` null); memoization test — single hero-field edit re-renders hero (2), not categories (1); reference-definition snapshot |
 | 8 | Structured editing; invalid edits rejected; undo-ready state shape |
 | 9 | CRUD + ownership + validation integration tests on real PG; transactional write; reload == saved; e2e save/reload |
 | 10 | Security checklist + a11y + perf thresholds; CSP active |
