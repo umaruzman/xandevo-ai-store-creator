@@ -1,15 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { type User } from '@prisma/client';
+import { type MeResponse } from '@xandevo/shared';
 
 import { CurrentUser } from '../auth/current-user.decorator';
-
-export interface MeResponse {
-  id: string;
-  email: string;
-  displayName: string;
-  avatarUrl: string | null;
-  createdAt: string;
-}
 
 @Controller()
 export class UsersController {

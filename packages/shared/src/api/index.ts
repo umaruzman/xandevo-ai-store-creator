@@ -14,6 +14,14 @@ export interface ApiErrorBody {
   };
 }
 
+export interface MeResponse {
+  id: string;
+  email: string;
+  displayName: string;
+  avatarUrl: string | null;
+  createdAt: string;
+}
+
 export interface GenerateStoreRequest {
   prompt: string;
 }
