@@ -1,5 +1,5 @@
-import { type INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { type NestExpressApplication } from '@nestjs/platform-express';
 import {
   API_JWT_ALGORITHM,
   API_JWT_AUDIENCE,
@@ -10,6 +10,7 @@ import { SignJWT } from 'jose';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
+import { configureApp } from '../src/bootstrap';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 const SECRET = 'e2e-secret-at-least-16-characters-long';
@@ -28,7 +29,7 @@ async function mint(
 }
 
 describe('Auth (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let prisma: PrismaService;
   const claims: ApiJwtClaims = {
     sub: `e2e-${Date.now()}`,
@@ -39,7 +40,8 @@ describe('Auth (e2e)', () => {
   beforeAll(async () => {
     process.env.AUTH_JWT_SECRET = SECRET;
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication<NestExpressApplication>();
+    configureApp(app);
     await app.init();
     prisma = app.get(PrismaService);
   });

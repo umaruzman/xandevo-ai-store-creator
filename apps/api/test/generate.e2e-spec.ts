@@ -1,5 +1,5 @@
-import { type INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { type NestExpressApplication } from '@nestjs/platform-express';
 import {
   API_JWT_ALGORITHM,
   API_JWT_AUDIENCE,
@@ -11,6 +11,7 @@ import request from 'supertest';
 
 import { AI_PROVIDER, type AiProvider } from '../src/ai/ai-provider';
 import { AppModule } from '../src/app.module';
+import { configureApp } from '../src/bootstrap';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 const SECRET = 'generate-e2e-secret-at-least-16-chars';
@@ -40,7 +41,7 @@ const fakeProvider: AiProvider = {
 };
 
 describe('POST /generate (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -49,7 +50,8 @@ describe('POST /generate (e2e)', () => {
       .overrideProvider(AI_PROVIDER)
       .useValue(fakeProvider)
       .compile();
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication<NestExpressApplication>();
+    configureApp(app);
     await app.init();
     prisma = app.get(PrismaService);
   });
@@ -72,7 +74,9 @@ describe('POST /generate (e2e)', () => {
       .send({ prompt: 'short' })
       .expect(400);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
-    expect(res.body.error.requestId).toEqual(expect.any(String));
+    // request-id middleware ran: a real id, echoed on the response and in the envelope
+    expect(res.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
+    expect(res.body.error.requestId).toBe(res.headers['x-request-id']);
   });
 
   it('200 with a validated, normalized definition and no secrets in the body', async () => {
@@ -87,6 +91,7 @@ describe('POST /generate (e2e)', () => {
     expect(res.body.definition.schemaVersion).toBe(1);
     expect(res.body.definition.pages).toHaveLength(3);
     expect(res.body.definition.pages[0].sections[0].id).toEqual(expect.any(String));
+    expect(res.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
     expect(JSON.stringify(res.body)).not.toContain(SECRET);
   });
 

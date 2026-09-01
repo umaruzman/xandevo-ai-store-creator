@@ -1,4 +1,4 @@
-import { type MiddlewareConsumer, Module, type NestModule, ValidationPipe } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -7,7 +7,6 @@ import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AllExceptionsFilter } from './common/all-exceptions.filter';
-import { RequestIdMiddleware } from './common/request-id.middleware';
 import { UserThrottlerGuard } from './common/user-throttler.guard';
 import { GenerationModule } from './generation/generation.module';
 import { HealthModule } from './health/health.module';
@@ -16,8 +15,9 @@ import { UsersModule } from './users/users.module';
 
 /**
  * Root module. Phase 5: config + Prisma + AI provider + auth (global JWT guard) +
- * users + generation + health, with a request-id middleware, global validation
- * pipe, standard error filter, and per-user rate limiting.
+ * users + generation + health, with a global validation pipe, standard error
+ * filter, and per-user rate limiting. The request-id middleware and body-parser
+ * limit are applied in `bootstrap.ts` (see the note there).
  */
 @Module({
   imports: [
@@ -45,8 +45,4 @@ import { UsersModule } from './users/users.module';
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(RequestIdMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

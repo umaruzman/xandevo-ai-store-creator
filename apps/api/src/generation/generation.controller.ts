@@ -4,7 +4,7 @@ import { type User } from '@prisma/client';
 import { type GenerateStoreResponse } from '@xandevo/shared';
 
 import { CurrentUser } from '../auth/current-user.decorator';
-import { type RequestWithId } from '../common/request-id.middleware';
+import { type RequestWithId } from '../common/request-id';
 import { GenerateStoreDto } from './dto/generate-store.dto';
 import { GenerationService } from './generation.service';
 

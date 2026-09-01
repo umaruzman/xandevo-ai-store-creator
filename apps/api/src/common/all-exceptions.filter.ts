@@ -11,7 +11,7 @@ import { StoreDefinitionError } from '@xandevo/shared';
 import { type Response } from 'express';
 
 import { AiGenerationError } from '../generation/generation.error';
-import { type RequestWithId } from './request-id.middleware';
+import { type RequestWithId } from './request-id';
 
 interface ErrorBody {
   error: {
