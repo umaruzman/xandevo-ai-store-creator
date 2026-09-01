@@ -91,17 +91,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const response = exception.getResponse();
-      const message =
-        typeof response === 'string'
-          ? response
-          : ((response as { message?: string | string[] }).message ?? exception.message);
+      const body = (typeof response === 'string' ? {} : response) as {
+        message?: string | string[];
+        code?: string;
+      };
+      const message = body.message ?? (typeof response === 'string' ? response : exception.message);
       const details =
         Array.isArray(message) && status === HttpStatus.BAD_REQUEST
           ? message.map((m) => ({ path: '(body)', message: String(m) }))
           : undefined;
       return {
         status,
-        code: CODE_BY_STATUS[status] ?? 'ERROR',
+        code: body.code ?? CODE_BY_STATUS[status] ?? 'ERROR',
         message: Array.isArray(message) ? 'validation failed' : String(message),
         details,
       };
