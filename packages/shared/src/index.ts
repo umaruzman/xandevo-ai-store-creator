@@ -6,6 +6,7 @@
  * - `domain/*` — the pure untrusted-input pipeline: schema → business validation
  *   → sanitization → normalization.
  * - `api/*` — REST transport DTO types.
+ * - `auth/*` — the API JWT contract (issuer/audience/TTL/claims), ADR-005.
  *
  * Test fixtures are also available from `@xandevo/shared/testing`.
  */
@@ -13,6 +14,7 @@
 export * from './store-definition/index.js';
 export * from './domain/index.js';
 export * from './api/index.js';
+export * from './auth/index.js';
 export * from './testing/fixtures.js';
 export * from './testing/ids.js';
 
