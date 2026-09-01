@@ -6,7 +6,7 @@ import { generateStoreAction } from '@/app/(dashboard)/stores/new/actions';
 import { selectHasDefinition, useBuilderStore } from '@/lib/store/builder';
 
 import { PromptForm } from './prompt-form';
-import { StorePreview } from './store-preview';
+import { StoreEditor } from './store-editor';
 
 /**
  * Owns the create-store flow: prompt form -> Server Action -> builder store ->
@@ -28,7 +28,7 @@ export function CreateStoreFlow() {
     else setGenerationError(state.error);
   }, [state, setGenerated, setGenerationError]);
 
-  if (hasDefinition) return <StorePreview onStartOver={reset} />;
+  if (hasDefinition) return <StoreEditor onStartOver={reset} />;
 
   return (
     <PromptForm

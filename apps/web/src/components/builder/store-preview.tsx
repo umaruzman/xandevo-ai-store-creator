@@ -4,18 +4,19 @@ import { useState } from 'react';
 
 import { StoreRenderer } from '@/components/renderer/store-renderer';
 import { Button } from '@/components/ui/button';
+import { selectIsDirty, useBuilderStore } from '@/lib/store/builder';
 import { cn } from '@/lib/utils';
-import { useBuilderStore } from '@/lib/store/builder';
 
 type Device = 'desktop' | 'mobile';
 
 /**
- * Preview chrome (device toggle, actions) wrapping the schema-driven
+ * Preview chrome (device toggle, dirty state, actions) wrapping the schema-driven
  * `<StoreRenderer>`. Reads the working definition from the builder store, so it
- * re-renders live as state changes (the editor arrives in Phase 8).
+ * re-renders live as the editor mutates state.
  */
 export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
   const definition = useBuilderStore((s) => s.definition);
+  const isDirty = useBuilderStore(selectIsDirty);
   const [device, setDevice] = useState<Device>('desktop');
   if (!definition) return null;
 
@@ -23,7 +24,14 @@ export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium">{definition.meta.name}</p>
+          <p className="flex items-center gap-2 text-sm font-medium">
+            {definition.meta.name}
+            {isDirty ? (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+                Unsaved changes
+              </span>
+            ) : null}
+          </p>
           <p className="text-muted-foreground text-xs">
             Live preview · {definition.pages.length} pages · {definition.products.length} products
           </p>
@@ -48,7 +56,7 @@ export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
           <Button variant="outline" size="sm" onClick={onStartOver}>
             Start over
           </Button>
-          <Button size="sm" disabled>
+          <Button size="sm" disabled className={cn(isDirty && 'opacity-100')}>
             Save (Phase 9)
           </Button>
         </div>
