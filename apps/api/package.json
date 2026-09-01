@@ -17,18 +17,24 @@
     "test:e2e": "prisma generate && jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.32.1",
     "@nestjs/common": "11.0.1",
     "@nestjs/config": "4.0.0",
     "@nestjs/core": "11.0.1",
     "@nestjs/jwt": "11.0.0",
     "@nestjs/passport": "11.0.5",
     "@nestjs/platform-express": "11.0.1",
+    "@nestjs/throttler": "6.3.0",
     "@prisma/client": "6.2.1",
     "@xandevo/shared": "workspace:*",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.1",
     "passport": "0.7.0",
     "passport-jwt": "4.0.1",
     "reflect-metadata": "0.2.2",
-    "rxjs": "7.8.1"
+    "rxjs": "7.8.1",
+    "zod": "3.24.1",
+    "zod-to-json-schema": "3.24.1"
   },
   "devDependencies": {
     "@nestjs/cli": "11.0.0",
