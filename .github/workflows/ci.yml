@@ -29,3 +29,5 @@ jobs:
         run: pnpm turbo run typecheck lint test build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
+          # `prisma generate` resolves env("DATABASE_URL") but never connects here.
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public

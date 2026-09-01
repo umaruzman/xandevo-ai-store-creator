@@ -1,18 +1,26 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 
-/**
- * Liveness / readiness. Phase 2: static responses.
- * `ready` gains a real DB check once Prisma lands in Phase 3.
- */
+import { PrismaService } from '../prisma/prisma.service';
+
 @Controller()
 export class HealthController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /** Liveness — the process is up. */
   @Get('health')
   health(): { status: 'ok' } {
     return { status: 'ok' };
   }
 
+  /** Readiness — dependencies (the database) are reachable. */
   @Get('ready')
-  ready(): { status: 'ok' } {
+  async ready(): Promise<{ status: 'ok' }> {
+    if (!(await this.prisma.isHealthy())) {
+      throw new ServiceUnavailableException({
+        status: 'unavailable',
+        detail: 'database unreachable',
+      });
+    }
     return { status: 'ok' };
   }
 }

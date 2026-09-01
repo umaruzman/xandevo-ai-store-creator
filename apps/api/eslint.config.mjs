@@ -8,8 +8,10 @@ export default [
   {
     files: ['**/*.ts'],
     rules: {
-      // Nest DI relies on parameter decorators + design:paramtypes metadata.
+      // Nest DI relies on parameter decorators + design:paramtypes metadata, so
+      // classes used as injection tokens must be value imports.
       '@typescript-eslint/no-extraneous-class': 'off',
+      '@typescript-eslint/consistent-type-imports': 'off',
     },
   },
 ];

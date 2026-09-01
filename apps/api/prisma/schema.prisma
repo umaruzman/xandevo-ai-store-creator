@@ -1,0 +1,317 @@
+// Xandevo data model — ADR-006 (normalized; JSON only for Store presentation tokens).
+// Conceptual reference: docs/database/data-model.md
+// Phase 3: schema + first migration + PrismaModule. No application/repository logic yet.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Enums (structural) ───────────────────────────
+enum StoreStatus {
+  draft
+  saved
+}
+
+enum SectionType {
+  hero
+  categories
+  productGrid
+  richText
+  contact
+  cta
+}
+
+enum LinkTargetType {
+  page
+  section
+  external
+  none
+}
+
+enum ProductImageKind {
+  placeholder
+  url
+}
+
+enum ProductBadge {
+  new
+  limited
+  bestseller
+}
+
+// ─────────────────────────────── Identity ─────────────────────────────────
+model User {
+  id          String   @id @default(uuid()) @db.Uuid
+  googleSub   String   @unique
+  email       String   @unique
+  displayName String
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stores Store[]
+
+  @@map("users")
+}
+
+// ──────────────────────────────── Store ───────────────────────────────────
+model Store {
+  id              String      @id @default(uuid()) @db.Uuid
+  userId          String      @db.Uuid
+  name            String
+  slug            String
+  tagline         String?
+  locale          String
+  currency        String      @db.Char(3)
+  status          StoreStatus @default(draft)
+  promptText      String
+  promptVersion   String
+  schemaVersion   Int
+  // Bounded presentation-token blobs, validated by Zod on write (never a whole-definition blob).
+  theme           Json
+  navigation      Json
+  header          Json
+  footer          Json
+  announcementBar Json?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pages      Page[]
+  categories Category[]
+  products   Product[]
+
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("stores")
+}
+
+// ──────────────────────────────── Page ────────────────────────────────────
+model Page {
+  id        String   @id @default(uuid()) @db.Uuid
+  storeId   String   @db.Uuid
+  slug      String
+  title     String
+  position  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  sections Section[]
+
+  heroTargetedBy HeroSection[] @relation("HeroCtaTargetPage")
+  ctaTargetedBy  CtaSection[]  @relation("CtaButtonTargetPage")
+
+  @@unique([storeId, slug])
+  @@unique([storeId, position])
+  @@index([storeId])
+  @@map("pages")
+}
+
+// ───────────────────────── Section (base + per type) ──────────────────────
+model Section {
+  id         String      @id @default(uuid()) @db.Uuid
+  pageId     String      @db.Uuid
+  type       SectionType
+  position   Int
+  // Shared layout (presentational strings, Zod-guarded).
+  background String
+  container  String
+  paddingY   String
+  align      String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  hero        HeroSection?
+  categories  CategoriesSection?
+  productGrid ProductGridSection?
+  richText    RichTextSection?
+  contact     ContactSection?
+  cta         CtaSection?
+
+  heroTargetedBy HeroSection[] @relation("HeroCtaTargetSection")
+  ctaTargetedBy  CtaSection[]  @relation("CtaButtonTargetSection")
+
+  @@unique([pageId, position])
+  @@index([pageId])
+  @@map("sections")
+}
+
+model HeroSection {
+  sectionId        String         @id @db.Uuid
+  headline         String
+  subheadline      String?
+  description      String
+  heroLayout       String
+  height           String
+  overlayStrength  Int
+  ctaLabel         String
+  ctaTargetType    LinkTargetType
+  ctaTargetPageId  String?        @db.Uuid
+  ctaTargetSectionId String?      @db.Uuid
+  ctaTargetUrl     String?
+
+  section       Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  ctaTargetPage Page?    @relation("HeroCtaTargetPage", fields: [ctaTargetPageId], references: [id], onDelete: SetNull)
+  ctaTargetSection Section? @relation("HeroCtaTargetSection", fields: [ctaTargetSectionId], references: [id], onDelete: SetNull)
+
+  @@map("hero_sections")
+}
+
+model CategoriesSection {
+  sectionId        String @id @db.Uuid
+  title            String?
+  categoriesLayout String
+  columns          Int
+
+  section Section                   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  items   CategoriesSectionItem[]
+
+  @@map("categories_sections")
+}
+
+model ProductGridSection {
+  sectionId       String  @id @db.Uuid
+  title           String?
+  productGridLayout String
+  columns         Int
+  limit           Int?
+  cardVariant     Json?
+  showViewAll     Boolean
+  categoryId      String? @db.Uuid
+
+  section  Section                    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  category Category?                   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  items    ProductGridSectionItem[]
+
+  @@map("product_grid_sections")
+}
+
+model RichTextSection {
+  sectionId String  @id @db.Uuid
+  title     String?
+  body      String
+  width     String
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@map("rich_text_sections")
+}
+
+model ContactSection {
+  sectionId     String  @id @db.Uuid
+  title         String?
+  description   String?
+  email         String?
+  phone         String?
+  address       String?
+  showForm      Boolean
+  contactLayout String
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@map("contact_sections")
+}
+
+model CtaSection {
+  sectionId          String         @id @db.Uuid
+  headline           String
+  description        String?
+  ctaLayout          String
+  emphasis           String
+  buttonLabel        String
+  buttonTargetType   LinkTargetType
+  buttonTargetPageId String?        @db.Uuid
+  buttonTargetSectionId String?     @db.Uuid
+  buttonTargetUrl    String?
+
+  section          Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  buttonTargetPage Page?    @relation("CtaButtonTargetPage", fields: [buttonTargetPageId], references: [id], onDelete: SetNull)
+  buttonTargetSection Section? @relation("CtaButtonTargetSection", fields: [buttonTargetSectionId], references: [id], onDelete: SetNull)
+
+  @@map("cta_sections")
+}
+
+model CategoriesSectionItem {
+  sectionId  String @db.Uuid
+  categoryId String @db.Uuid
+  position   Int
+
+  section  CategoriesSection @relation(fields: [sectionId], references: [sectionId], onDelete: Cascade)
+  category Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([sectionId, categoryId])
+  @@unique([sectionId, position])
+  @@index([categoryId])
+  @@map("categories_section_items")
+}
+
+model ProductGridSectionItem {
+  sectionId String @db.Uuid
+  productId String @db.Uuid
+  position  Int
+
+  section ProductGridSection @relation(fields: [sectionId], references: [sectionId], onDelete: Cascade)
+  product Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([sectionId, productId])
+  @@unique([sectionId, position])
+  @@index([productId])
+  @@map("product_grid_section_items")
+}
+
+// ────────────────────────── Catalogue ────────────────────────────────────
+model Category {
+  id          String  @id @default(uuid()) @db.Uuid
+  storeId     String  @db.Uuid
+  name        String
+  slug        String
+  description String?
+  accentColor String?
+  position    Int
+
+  store               Store                    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products            Product[]
+  productGridSections ProductGridSection[]
+  sectionItems        CategoriesSectionItem[]
+
+  @@unique([storeId, slug])
+  @@index([storeId])
+  @@map("categories")
+}
+
+model Product {
+  id          String            @id @default(uuid()) @db.Uuid
+  storeId     String            @db.Uuid
+  categoryId  String            @db.Uuid
+  name        String
+  slug        String
+  description String
+  priceMinor  Int
+  currency    String            @db.Char(3)
+  imageKind   ProductImageKind
+  imageRef    String
+  imageStyle  String?
+  featured    Boolean           @default(false)
+  badge       ProductBadge?
+  position    Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  store        Store                    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category     Category                 @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  sectionItems ProductGridSectionItem[]
+
+  @@unique([storeId, slug])
+  @@index([storeId])
+  @@index([storeId, categoryId])
+  @@map("products")
+}
