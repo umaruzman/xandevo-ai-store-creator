@@ -110,7 +110,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
   injection / oversized fixtures); provider contract test vs recorded fixture; no vendor SDK
   imported outside `src/ai/providers`; no key in logs/responses.
 
-## Phase 6 — Dashboard & Store Creation UX
+## Phase 6 — Dashboard & Store Creation UX  ✅ COMPLETE (2026-09-01)
 
 - **Objective:** the create-store flow UI up to a generated (unsaved) preview handoff.
 - **Scope:** dashboard store list (RSC + `GET /stores` — read path may return empty until
@@ -234,7 +234,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 | 3 | Full normalized schema (~15 tables, per-type section tables, FK refs) migrates clean; Store Definition v1 + validators tested vs adversarial input; mapper round-trip identity + minimal-diff |
 | 4 | API 401s (no token / bad sig / wrong iss·aud / expired) + `/me` provisions & returns; middleware redirects `/dashboard`; sign-in/out buttons wired. Browser Google e2e → Phase 11 |
 | 5 | `/generate` pipeline tested with Fake + scripted providers (valid / retry / exhausted / schema-invalid / business-invalid / injection); Anthropic contract test vs recorded fixture; e2e 200·400·401·429 + no secret in body; ESLint blocks vendor SDK imports outside `src/ai/providers/` |
-| 6 | Prompt→generation→builder-store flow; component + store tests; RSC/client discipline |
+| 6 | Prompt→Server-Action→builder-store→summary flow; `PromptForm` + `CreateStoreFlow` component tests; builder-store unit tests (load/reset/`selectIsDirty`); form a11y (label/hint/alert/status); pages stay RSC. TanStack Query deferred to Phase 9 |
 | 7 | Every section renders; theme via CSS vars; no raw HTML; memoization verified |
 | 8 | Structured editing; invalid edits rejected; undo-ready state shape |
 | 9 | CRUD + ownership + validation integration tests on real PG; transactional write; reload == saved; e2e save/reload |

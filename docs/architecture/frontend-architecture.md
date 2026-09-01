@@ -2,6 +2,14 @@
 
 Next.js 15, App Router, React, **TypeScript only**, TailwindCSS, shadcn/ui.
 
+> **Built so far:** root layout + `(auth)/sign-in` + `(dashboard)` group (Phase 4);
+> `(dashboard)/dashboard` (RSC, `apiClient.me()`, empty stores list) and
+> `(dashboard)/stores/new` (Phase 6) — RSC page → `<CreateStoreFlow>` (client):
+> `PromptForm` → Server Action `generateStoreAction` → `apiClient.generateStore` →
+> `useBuilderStore.setGenerated` → `<GeneratedSummary>`. Single route, two states, no
+> navigation/persistence. Zustand builder store per ADR-007; TanStack Query deferred to
+> Phase 9. `middleware.ts` gates `/dashboard/*` and `/stores/*`.
+
 ## 1. Guiding rules
 
 - **Server Components by default.** Add `"use client"` only when the component needs state,

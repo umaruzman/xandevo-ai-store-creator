@@ -14,11 +14,17 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 5 — AI Generation Engine. COMPLETE.** Next: **Phase 6 — Dashboard & Store Creation
-UX** (prompt form, generation status UI, Zustand builder store, load `/generate` result;
-no renderer/editor/save yet).
+**Phase 6 — Dashboard & Store Creation UX. COMPLETE.** Next: **Phase 7 — Store Renderer &
+Live Preview** (`<StoreRenderer>` + `SECTION_REGISTRY`, theme via CSS vars, variant recipes,
+instant re-render from the builder store; no editor/save).
 
 What exists now:
+- **Web builder (Phase 6):** `lib/store/builder.ts` (Zustand — the one working `definition`,
+  `generation` status, `selectIsDirty` via `lib/hash.ts`); `(dashboard)/stores/new` RSC →
+  `<CreateStoreFlow>` (client) → `PromptForm` → **Server Action `generateStoreAction`** →
+  `lib/api-client.ts#generateStore` (over server-only `apiFetch`) → `setGenerated` →
+  `<GeneratedSummary>`. `middleware.ts` gates `/dashboard/*` + `/stores/*`. TanStack Query
+  is Phase 9 (no persisted reads yet).
 - **AI generation (Phase 5):** `AiModule` (`AiProvider` interface + `AI_PROVIDER` token,
   factory on `AI_PROVIDER` env); providers under `src/ai/providers/` only —
   `AnthropicProvider` (default, `emit_store_definition` tool) + `FakeAiProvider`
@@ -47,10 +53,10 @@ What exists now:
 - Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
   `AI_PROVIDER=fake` runs generation with no API key (dev/CI).
 
-Still prohibited until their phase: store creation UX, store renderer, live preview, dynamic
-editor, store repositories / persistence endpoints (`POST/GET/PATCH /stores`, Phase 9).
-A real landing page is Phase 10 (the current `app/page.tsx` is a placeholder).
-See `docs/development/roadmap.md`.
+Still prohibited until their phase: store **renderer** / live preview (Phase 7), dynamic
+**editor** (Phase 8), store repositories / persistence endpoints + **save** + TanStack Query
+(`POST/GET/PATCH /stores`, Phase 9). A real landing page is Phase 10 (the current
+`app/page.tsx` is a placeholder). See `docs/development/roadmap.md`.
 
 ## Technology stack
 

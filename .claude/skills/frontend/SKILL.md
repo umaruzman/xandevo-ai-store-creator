@@ -18,11 +18,14 @@ Full detail: `docs/architecture/frontend-architecture.md`. This is the checklist
 ## State (ADR-007)
 
 - Persisted data → **TanStack Query** hooks (`useStores`, `useStore`, `useCreateStore`,
-  `useUpdateStore`). Invalidate on mutation.
-- Working store definition → the single **Zustand** builder store (`lib/store/builder.ts`).
-  It is the only editable copy. Hydrate it from a Query result; never edit inside the Query
-  cache.
-- `isDirty` is a derived selector, not stored.
+  `useUpdateStore`). Invalidate on mutation. **(Introduced in Phase 9 — not yet present.)**
+- Working store definition → the single **Zustand** builder store (`lib/store/builder.ts`,
+  built in Phase 6). It is the only editable copy. Hydrate it from a Query result; never edit
+  inside the Query cache.
+- `selectIsDirty` is a derived selector (FNV-1a hash of a key-sorted stringify vs
+  `savedHash`), not stored.
+- Until Phase 9, generation runs through a **Server Action** (`useActionState`) that calls
+  the server-only `apiFetch`; its result is pushed into the builder store in a `useEffect`.
 - `updateField(path, value)` validates against the relevant Zod sub-schema before applying;
   replaces `definition` immutably.
 - Local UI state → `useState` / `react-hook-form`.

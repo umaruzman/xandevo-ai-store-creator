@@ -1,7 +1,25 @@
 # ADR-007 — Frontend State Management Strategy
 
-- **Status:** Accepted (Phase 1)
+- **Status:** Accepted (Phase 1). Client-state half **implemented in Phase 6**;
+  TanStack Query half lands in Phase 9.
 - **Date:** 2026-08-31
+
+## Implementation
+
+- **Phase 6 — `lib/store/builder.ts` (Zustand):** the single working copy of the editable
+  `definition` plus `storeId`, `promptVersion`, `savedHash`, and `generation { status,
+  error }`. Actions: `startGeneration`, `setGenerated`, `setGenerationError`,
+  `loadFromServer` / `markSaved` (stubs used from Phase 9), `reset`. `selectIsDirty` is a
+  derived selector — `hashValue(definition) !== savedHash` where `hashValue` is FNV-1a over
+  a key-sorted `stableStringify` (`lib/hash.ts`). Immutable replacement of `definition`
+  keeps undo/redo (`zundo`) addable without refactor.
+- **Phase 6 — generation is a Server Action** (`useActionState`), not a TanStack Query
+  mutation: it needs the server-only JWT-minting `apiFetch`, and there is no cache to
+  invalidate yet. The action result is pushed into the builder store via `useEffect`.
+- **Phase 9 — TanStack Query** is introduced for the first persisted reads (`GET /stores`,
+  `GET /stores/:id`) and mutations (`POST`/`PATCH /stores`), with query hooks + a
+  `QueryClientProvider`. The builder store is *hydrated from* a query result, never edited
+  inside the query cache.
 
 ## Context
 
