@@ -14,11 +14,20 @@ Store Definition → Schema Validation → Live Preview → Dynamic Editing → 
 
 ## Current phase
 
-**Phase 4 — Authentication. COMPLETE.** Next: **Phase 5 — AI Generation Engine**
-(`AiModule` + `AiProvider` interface + Anthropic impl + `FakeAiProvider`, versioned prompts,
-`GenerationModule` running the shared pipeline, `POST /generate`, retry/timeout, rate limiting).
+**Phase 5 — AI Generation Engine. COMPLETE.** Next: **Phase 6 — Dashboard & Store Creation
+UX** (prompt form, generation status UI, Zustand builder store, load `/generate` result;
+no renderer/editor/save yet).
 
 What exists now:
+- **AI generation (Phase 5):** `AiModule` (`AiProvider` interface + `AI_PROVIDER` token,
+  factory on `AI_PROVIDER` env); providers under `src/ai/providers/` only —
+  `AnthropicProvider` (default, `emit_store_definition` tool) + `FakeAiProvider`
+  (`AI_PROVIDER=fake`). `GenerationModule`: versioned prompt TS module
+  `generation/prompts/store/v1.ts`, `PromptBuilder`, `GenerationService` (retry ×3 +
+  backoff, 60 s timeout, runs `buildStoreDefinition`, JSON logs + cost estimate). **`POST
+  /generate`** (auth, `@HttpCode(200)`, 10/min/user) → `{ definition, promptVersion, usage }`.
+  Global `ValidationPipe`, `AllExceptionsFilter` (standard `{ error: {...} }` envelope),
+  `RequestIdMiddleware`, per-user `ThrottlerGuard`.
 - **Auth (Phase 4):** `@xandevo/shared/auth` (API JWT contract); `apps/web` Auth.js
   (NextAuth v5) Google + `mintApiToken` + `apiFetch` + `middleware.ts` gating `/dashboard`;
   `apps/api` global `JwtAuthGuard` (`@Public()` opts out) + `JwtStrategy` + `UsersModule`
@@ -29,17 +38,19 @@ What exists now:
   `sanitizeStoreDefinitionInput` → `normalizeStoreDefinition`, throwing `StoreDefinitionError`),
   API DTO types (`api/*`), test fixtures (`testing/*`, also at `@xandevo/shared/testing`).
 - **`apps/api`** — `prisma/schema.prisma` (15 tables per ADR-006) + first migration;
-  `PrismaModule`/`PrismaService`; `ConfigModule`; `HealthModule` (`/ready` does a real DB
-  ping); `AuthModule` + `UsersModule` (Phase 4); `src/stores/domain/store-definition.mapper.ts`
-  (`toRows`/`toDefinition`, pure, round-trip tested). Endpoints: `/health`, `/ready`, `/me`.
-  No store repositories / persistence wiring yet.
+  `PrismaModule`/`PrismaService`; `ConfigModule`; `HealthModule`; `AuthModule` + `UsersModule`
+  (Phase 4); `AiModule` + `GenerationModule` (Phase 5);
+  `src/stores/domain/store-definition.mapper.ts` (`toRows`/`toDefinition`, pure, round-trip
+  tested). Endpoints: `/health`, `/ready`, `/me`, `POST /generate`. No store repositories /
+  persistence wiring yet.
 - Monorepo, CI, Docker Compose Postgres (host port **5433**) from Phase 2.
 - Per-app env: `apps/api/.env`, `apps/web/.env` (copy from each `.env.example`).
+  `AI_PROVIDER=fake` runs generation with no API key (dev/CI).
 
-Still prohibited until their phase: AI generation pipeline, store creation UX, store
-renderer, live preview, dynamic editor, store repositories / persistence endpoints
-(`POST/GET/PATCH /stores`, Phase 9). A real landing page is Phase 10 (the current
-`app/page.tsx` is a placeholder). See `docs/development/roadmap.md`.
+Still prohibited until their phase: store creation UX, store renderer, live preview, dynamic
+editor, store repositories / persistence endpoints (`POST/GET/PATCH /stores`, Phase 9).
+A real landing page is Phase 10 (the current `app/page.tsx` is a placeholder).
+See `docs/development/roadmap.md`.
 
 ## Technology stack
 

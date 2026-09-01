@@ -2,12 +2,13 @@
 
 **by Umar Uzman**
 
-> **Status: Phase 4 (Authentication) complete.**
-> Monorepo + CI (Phase 2); **Store Definition Zod schema v1** + pipeline + normalized
-> **Prisma schema** (15 tables) + mapper (Phase 3); **Google sign-in** via Auth.js with a
-> short-lived JWT the API verifies, first-login user provisioning, `GET /me`, and a guarded
-> `(dashboard)` route group (Phase 4). Store generation/editing not built yet.
-> Next: **Phase 5 — AI Generation Engine**.
+> **Status: Phase 5 (AI Generation Engine) complete.**
+> Monorepo + CI; Store Definition schema + pipeline + Prisma model + mapper; Google
+> auth (Auth.js → API JWT → `GET /me`, guarded `(dashboard)`); and now
+> **`POST /generate`** — provider-agnostic (`AiProvider`; Anthropic default, `FakeAiProvider`
+> for keyless dev), retry/timeout, runs the validation pipeline, returns a normalized Store
+> Definition. Not built: store creation UI, renderer, editor, persistence.
+> Next: **Phase 6 — Dashboard & Store Creation UX**.
 
 ## Overview
 
@@ -142,11 +143,10 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 ## Current project status
 
-Phases 1–4 complete. Foundation (monorepo, CI), the Store Definition schema + pipeline +
-Prisma model + mapper, and Google authentication (Auth.js → short-lived API JWT →
-`JwtStrategy` → first-login provisioning → `GET /me`, guarded `(dashboard)` group) are in
-place. API endpoints: `/health`, `/ready`, `/me`. Decisions log:
-`docs/decisions/OPEN-QUESTIONS.md`. Next: **Phase 5 — AI Generation Engine**.
+Phases 1–5 complete. Foundation + Store Definition schema/pipeline/model/mapper + Google
+auth + the AI generation engine. API endpoints: `/health`, `/ready`, `/me`, `POST /generate`.
+Set `AI_PROVIDER=fake` in `apps/api/.env` to generate without an Anthropic key. Decisions
+log: `docs/decisions/OPEN-QUESTIONS.md`. Next: **Phase 6 — Dashboard & Store Creation UX**.
 
 ## Future roadmap
 

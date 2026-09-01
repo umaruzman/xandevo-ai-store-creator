@@ -8,15 +8,23 @@ description: Rules for Xandevo's AI generation pipeline — the AiProvider abstr
 Full detail: `docs/architecture/ai-architecture.md`, `docs/ai/prompt-engineering.md`,
 `docs/architecture/store-definition.md`. Checklist:
 
-## Provider abstraction (ADR-004)
+## Provider abstraction (ADR-004) — implemented, Phase 5
 
-- App code depends on the `AiProvider` interface only. Vendor SDK imports **only** under
-  `apps/api/src/ai/providers/`.
-- `AI_PROVIDER` env selects the impl via a Nest factory. Optional `AI_FALLBACK_PROVIDER`.
-- Each impl: enforce `timeoutMs` via `AbortController`, re-parse + `schema.safeParse` the
-  response, throw `AiProviderError { retryable }` on any failure.
-- Retry (max 2, backoff+jitter), timeout (60s), fallback, logging, cost — all in
-  `GenerationService` / a decorator, not in impls.
+- App code depends on the `AiProvider` interface + `AI_PROVIDER` token
+  (`apps/api/src/ai/ai-provider.ts`). Vendor SDK imports **only** under `src/ai/providers/`
+  — ESLint `no-restricted-imports` enforces it.
+- `AiModule` factory reads `process.env.AI_PROVIDER`: `anthropic` (default,
+  `emit_store_definition` tool) | `fake` (`FakeAiProvider`, keyless) | `openai`/`gemini`
+  (throw "not implemented"). **No fallback provider** in MVP.
+- Each impl: enforce `timeoutMs` via `AbortController`, re-`schema.safeParse` the output,
+  throw `AiProviderError { retryable }` (429/5xx/timeout/parse → true).
+- `GenerationService` owns the rest: retry `MAX_ATTEMPTS = 3` (backoff+jitter over
+  retryable provider errors *and* `schema`/`business` pipeline failures), 60 s timeout,
+  `buildStoreDefinition`, JSON log + `ai/cost.ts` estimate. Terminal failure →
+  `AiGenerationError` → `422 AI_GENERATION_FAILED` / `503 AI_UNAVAILABLE` via
+  `AllExceptionsFilter`. Never log/return prompt text, raw output, or keys.
+- Prompt templates are versioned **TS modules** `generation/prompts/store/v<n>.ts`; never
+  edit a released one. `PromptBuilder` injects `zodToJsonSchema(storeDefinitionInputSchema)`.
 
 ## AI output is untrusted — mandatory pipeline
 

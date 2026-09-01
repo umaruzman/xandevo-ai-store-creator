@@ -1,5 +1,14 @@
 # AI Architecture
 
+> **Implemented in Phase 5** (`apps/api/src/ai/*`, `apps/api/src/generation/*`). Specifics
+> that landed: default provider **Anthropic** via a required `emit_store_definition` tool
+> (schema from `zod-to-json-schema`); `FakeAiProvider` (`AI_PROVIDER=fake`); prompt template
+> as a versioned **TS module** `generation/prompts/store/v1.ts` (`PROMPT_VERSION='store@v1'`)
+> — no `.md` asset files; `GenerationService` retry `MAX_ATTEMPTS=3` with backoff over
+> provider-retryable errors *and* `schema`/`business` pipeline failures; 60 s per-attempt
+> timeout; **no fallback provider**; failures → `AiGenerationError` → `422` / `503` in the
+> standard envelope; per-generation JSON log with token usage + `ai/cost.ts` estimate.
+
 ## 1. Objectives
 
 - The application depends on an internal `AiProvider` interface, never on a vendor SDK.

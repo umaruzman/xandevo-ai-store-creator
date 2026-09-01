@@ -93,7 +93,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 - **Gate:** e2e sign-in/sign-out (mocked Google) passes; `GET /me` integration test; API
   401s without token; JWT `exp/iss/aud` verified.
 
-## Phase 5 — AI Generation Engine
+## Phase 5 — AI Generation Engine  ✅ COMPLETE (2026-09-01)
 
 - **Objective:** `POST /generate` end to end (no persistence).
 - **Scope:** `AiModule` + `AiProvider` interface + ≥1 real impl (default) + `FakeAiProvider`;
@@ -233,7 +233,7 @@ updated; architectural rules in `CLAUDE.md` + skills followed; Conventional Comm
 | 2 | Clone→install→dev works; CI green on skeleton |
 | 3 | Full normalized schema (~15 tables, per-type section tables, FK refs) migrates clean; Store Definition v1 + validators tested vs adversarial input; mapper round-trip identity + minimal-diff |
 | 4 | API 401s (no token / bad sig / wrong iss·aud / expired) + `/me` provisions & returns; middleware redirects `/dashboard`; sign-in/out buttons wired. Browser Google e2e → Phase 11 |
-| 5 | `/generate` pipeline tested with Fake + fixtures; no SDK leakage; no key exposure |
+| 5 | `/generate` pipeline tested with Fake + scripted providers (valid / retry / exhausted / schema-invalid / business-invalid / injection); Anthropic contract test vs recorded fixture; e2e 200·400·401·429 + no secret in body; ESLint blocks vendor SDK imports outside `src/ai/providers/` |
 | 6 | Prompt→generation→builder-store flow; component + store tests; RSC/client discipline |
 | 7 | Every section renders; theme via CSS vars; no raw HTML; memoization verified |
 | 8 | Structured editing; invalid edits rejected; undo-ready state shape |

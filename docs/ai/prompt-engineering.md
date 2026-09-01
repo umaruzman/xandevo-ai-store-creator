@@ -1,7 +1,15 @@
 # Prompt Engineering Guide
 
-How Xandevo constructs, versions, and constrains prompts for store generation. Implemented in
-Phase 5. Prompt files live at `apps/api/prompts/store/<version>.*`.
+How Xandevo constructs, versions, and constrains prompts for store generation.
+
+**Implemented (Phase 5):** templates are versioned **TypeScript modules** at
+`apps/api/src/generation/prompts/store/v<n>.ts`, each exporting `PROMPT_VERSION`
+(`store@v1`), `systemPrompt(schemaJson)`, `userPrompt(sanitizedPrompt)`. `PromptBuilder`
+injects `zodToJsonSchema(storeDefinitionInputSchema)` into the system prompt and passes the
+same Zod schema to `AiProvider.generateStructured`. The model must call the single required
+tool `emit_store_definition`. A released `v<n>.ts` is never edited — add `v<n+1>.ts` and
+bump `DEFAULT_PROMPT_VERSION`. (The earlier plan of `.md` files was dropped to avoid
+Nest asset-copying; TS modules compile and resolve everywhere.)
 
 ## 1. Goals
 

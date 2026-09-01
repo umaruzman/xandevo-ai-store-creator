@@ -1,7 +1,11 @@
 # API Contract
 
 Base URL: `${NEXT_PUBLIC_API_URL}` (e.g. `http://localhost:4000`). All routes are JSON.
-Auth: `Authorization: Bearer <jwt>` unless noted. **Not implemented yet — Phase 9.**
+Auth: `Authorization: Bearer <jwt>` unless noted.
+
+**Implemented so far:** `GET /health`, `GET /ready` (Phase 2/3), `GET /me` (Phase 4),
+`POST /generate` (Phase 5). `/stores*` land in Phase 9. Every response carries an
+`x-request-id` header (echoed as `error.requestId`).
 
 ## Conventions
 
@@ -30,16 +34,17 @@ Types below reference schemas in `packages/shared`.
 
 ---
 
-## POST /generate
+## POST /generate  *(implemented — Phase 5)*
 
 - **Purpose:** generate a Store Definition from a prompt. **Does not persist.**
-- **Auth:** required. **Rate limit:** ~10/min/user. **Body limit:** 2 KB.
-- **Request DTO:** `{ "prompt": string (10..1000 chars, trimmed, non-empty) }`
+- **Auth:** required. **Rate limit:** 10/min/user (global default 240/min); body limit 256 KB.
+- **Request DTO:** `{ "prompt": string (10..1000 chars, trimmed) }`
 - **Response 200:** `{ "definition": StoreDefinition, "promptVersion": string, "usage": { "inputTokens": number, "outputTokens": number } }`
-- **Validation:** prompt length/charset; HTML stripped server-side.
-- **Authorization:** any authenticated user.
-- **Errors:** 400 VALIDATION_ERROR, 401, 422 AI_GENERATION_FAILED (parse/schema/business/
-  sanitization failure), 429 RATE_LIMITED, 503 AI_UNAVAILABLE.
+  — `definition` is fully normalized (ids assigned, refs resolved, `schemaVersion` stamped).
+- **Validation:** DTO length; the service additionally strips HTML/delimiters before prompting.
+- **Errors:** `400 VALIDATION_ERROR`, `401 UNAUTHENTICATED`, `422 AI_GENERATION_FAILED`
+  (`details[0].path` = failing pipeline stage: `schema` | `business` | `sanitize` | `normalize`),
+  `429 RATE_LIMITED`, `503 AI_UNAVAILABLE` (provider exhausted after retries).
 
 ---
 
