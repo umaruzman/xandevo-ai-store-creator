@@ -1,0 +1,299 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`StoreRenderer snapshot > matches the reference definition (home page) 1`] = `
+<div
+  class="font-[family-name:var(--sf-font-body)] leading-[var(--sf-line-height)] bg-[var(--sf-background)] text-[var(--sf-text)]"
+  data-sf-root="true"
+  style="--sf-primary: #1A1A1A; --sf-secondary: #C9A24B; --sf-background: #FAF8F4; --sf-surface: #FFFFFF; --sf-text: #1A1A1A; --sf-muted: #6B6B6B; --sf-accent: #C9A24B; --sf-border: #E4DFD6; --sf-muted-bg: #6B6B6B1f; --sf-primary-contrast: #ffffff; --sf-font-heading: Georgia, 'Times New Roman', serif; --sf-font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; --sf-font-size-base: 16px; --sf-scale: 1.25; --sf-heading-weight: 400; --sf-letter-spacing: 0.08em; --sf-line-height: 1.6; --sf-radius: 4px; --sf-border-width: 1px; --sf-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 8px 24px rgb(0 0 0 / 0.06); --sf-space: 1.25; --sf-container: 72rem; --sf-button-radius: 4px;"
+>
+  <div
+    class="px-4 py-2 text-center text-xs bg-[var(--sf-text)] text-[var(--sf-surface)]"
+  >
+    Complimentary UAE delivery on orders over AED 500
+  </div>
+  <header
+    class="border-b border-[var(--sf-border)] px-4 py-4 sm:px-6 flex flex-col items-center gap-2 text-center"
+  >
+    <span
+      class="text-lg"
+      style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight);"
+    >
+      Maison Oud
+    </span>
+    <nav
+      class="flex flex-wrap gap-4 text-sm"
+    >
+      <a
+        class="opacity-80 hover:opacity-100"
+        href="#home"
+      >
+        Shop
+      </a>
+      <a
+        class="opacity-80 hover:opacity-100"
+        href="#about"
+      >
+        About
+      </a>
+      <a
+        class="opacity-80 hover:opacity-100"
+        href="#contact"
+      >
+        Contact
+      </a>
+    </nav>
+  </header>
+  <main>
+    <section
+      class="bg-[var(--sf-surface)] text-[var(--sf-text)]"
+      id="00000000-0000-4000-8000-000000000011"
+    >
+      <div
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+      >
+        <div
+          class="flex flex-col gap-4 items-center text-center min-h-[460px] justify-center rounded-[var(--sf-radius)] bg-[var(--sf-muted-bg)] p-8"
+          data-overlay-strength="2"
+        >
+          <h1
+            class="text-3xl sm:text-4xl"
+            style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight); letter-spacing: var(--sf-letter-spacing);"
+          >
+            The Art of Oud
+          </h1>
+          <p
+            class="text-lg opacity-80"
+          >
+            House of rare Arabian perfumery
+          </p>
+          <p
+            class="max-w-prose opacity-70"
+          >
+            Hand-blended fragrances sourced from Cambodia, Taif and Hindi oud.
+          </p>
+          <a
+            class="inline-flex items-center justify-center rounded-[var(--sf-button-radius)] font-medium transition-colors border border-[var(--sf-primary)] text-[var(--sf-primary)] h-10 px-5 text-sm mt-2"
+            href="#home"
+          >
+            Explore the collection
+          </a>
+        </div>
+      </div>
+    </section>
+    <section
+      class="bg-[var(--sf-surface)] text-[var(--sf-text)]"
+      id="00000000-0000-4000-8000-000000000012"
+    >
+      <div
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+      >
+        <h2
+          class="text-2xl sm:text-3xl"
+          style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight); letter-spacing: var(--sf-letter-spacing);"
+        >
+          Shop by family
+        </h2>
+        <ul
+          class="grid gap-4 grid-cols-2 sm:grid-cols-3"
+        >
+          <li>
+            <span
+              class="flex aspect-video items-end rounded-[var(--sf-radius)] border bg-[var(--sf-muted-bg)] p-3 font-medium"
+            >
+              Oud & Agarwood
+            </span>
+          </li>
+          <li>
+            <span
+              class="flex aspect-video items-end rounded-[var(--sf-radius)] border bg-[var(--sf-muted-bg)] p-3 font-medium"
+            >
+              Floral
+            </span>
+          </li>
+          <li>
+            <span
+              class="flex aspect-video items-end rounded-[var(--sf-radius)] border bg-[var(--sf-muted-bg)] p-3 font-medium"
+            >
+              Amber & Musk
+            </span>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <section
+      class="bg-[var(--sf-surface)] text-[var(--sf-text)]"
+      id="00000000-0000-4000-8000-000000000013"
+    >
+      <div
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+      >
+        <h2
+          class="text-2xl sm:text-3xl"
+          style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight); letter-spacing: var(--sf-letter-spacing);"
+        >
+          Bestsellers
+        </h2>
+        <div
+          class="grid gap-4 grid-cols-2 sm:grid-cols-3"
+        >
+          <article
+            class="relative flex flex-col justify-end overflow-hidden rounded-[var(--sf-radius)] p-2 shadow-[var(--sf-shadow)] transition-transform duration-200 hover:-translate-y-1"
+          >
+            <img
+              alt="Royal Oud 50ml"
+              class="w-full object-cover aspect-square"
+              loading="lazy"
+              src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(16%2055%25%2082%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(56%2055%25%2068%25)%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22600%22%20fill%3D%22hsl(16%2040%25%2030%25)%22%3ERO%3C%2Ftext%3E%3C%2Fsvg%3E"
+            />
+            <div
+              class="flex flex-col gap-0.5 p-3"
+            >
+              <div
+                class="flex items-baseline justify-between gap-2"
+              >
+                <span
+                  class="text-sm font-medium"
+                >
+                  Royal Oud 50ml
+                </span>
+              </div>
+              <span
+                class="text-sm opacity-70"
+              >
+                AED 899.00
+              </span>
+              <span
+                class="mt-1 w-fit rounded-full border px-2 py-0.5 text-[10px] uppercase"
+              >
+                bestseller
+              </span>
+            </div>
+          </article>
+          <article
+            class="relative flex flex-col justify-end overflow-hidden rounded-[var(--sf-radius)] p-2 shadow-[var(--sf-shadow)] transition-transform duration-200 hover:-translate-y-1"
+          >
+            <img
+              alt="Hindi Oud Intense"
+              class="w-full object-cover aspect-square"
+              loading="lazy"
+              src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%20400%20400%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22hsl(24%2055%25%2082%25)%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22hsl(64%2055%25%2068%25)%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22400%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22600%22%20fill%3D%22hsl(24%2040%25%2030%25)%22%3EHO%3C%2Ftext%3E%3C%2Fsvg%3E"
+            />
+            <div
+              class="flex flex-col gap-0.5 p-3"
+            >
+              <div
+                class="flex items-baseline justify-between gap-2"
+              >
+                <span
+                  class="text-sm font-medium"
+                >
+                  Hindi Oud Intense
+                </span>
+              </div>
+              <span
+                class="text-sm opacity-70"
+              >
+                AED 1,299.00
+              </span>
+            </div>
+          </article>
+        </div>
+        <a
+          class="text-sm underline opacity-70"
+          href="#"
+        >
+          View all
+        </a>
+      </div>
+    </section>
+    <section
+      class="bg-[var(--sf-surface)] text-[var(--sf-text)]"
+      id="00000000-0000-4000-8000-000000000014"
+    >
+      <div
+        class="flex flex-col gap-6 mx-auto w-full max-w-[var(--sf-container)] px-4 sm:px-6 py-12 sm:py-16 text-left items-start"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div
+            class="space-y-1"
+          >
+            <h2
+              class="text-2xl font-[var(--sf-heading-weight)] sm:text-3xl"
+              style="font-family: var(--sf-font-heading); font-weight: var(--sf-heading-weight); letter-spacing: var(--sf-letter-spacing);"
+            >
+              Free UAE delivery over AED 500
+            </h2>
+          </div>
+          <a
+            class="inline-flex items-center justify-center rounded-[var(--sf-button-radius)] font-medium transition-colors border border-[var(--sf-primary)] text-[var(--sf-primary)] h-10 px-5 text-sm"
+            href="#home"
+          >
+            Shop now
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer
+    class="border-t border-[var(--sf-border)] bg-[var(--sf-muted-bg)] px-4 py-10 text-sm sm:px-6"
+  >
+    <div
+      class="mx-auto grid max-w-[var(--sf-container)] gap-6 sm:grid-cols-2 md:grid-cols-4"
+    >
+      <div>
+        <p
+          class="mb-2 font-medium"
+        >
+          Explore
+        </p>
+        <ul
+          class="space-y-1 opacity-70"
+        >
+          <li>
+            <a
+              href="#about"
+            >
+              About
+            </a>
+          </li>
+          <li>
+            <a
+              href="#contact"
+            >
+              Contact
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <p
+          class="mb-2 font-medium"
+        >
+          Social
+        </p>
+        <ul
+          class="space-y-1 opacity-70"
+        >
+          <li>
+            instagram
+            : @
+            maisonoud
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p
+      class="mx-auto mt-8 max-w-[var(--sf-container)] opacity-60"
+    >
+      © 
+      2026
+       
+      Maison Oud
+       · Visa · Mastercard · Apple Pay
+       · Newsletter
+    </p>
+  </footer>
+</div>
+`;

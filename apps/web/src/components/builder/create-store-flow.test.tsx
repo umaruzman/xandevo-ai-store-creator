@@ -27,7 +27,7 @@ describe('CreateStoreFlow', () => {
     vi.clearAllMocks();
   });
 
-  it('generates, loads the definition into the builder store, and shows the summary', async () => {
+  it('generates, loads the definition and shows the live preview', async () => {
     generateStoreAction.mockResolvedValue({
       ok: true,
       data: { definition, promptVersion: 'store@v1', usage: { inputTokens: 0, outputTokens: 0 } },
@@ -40,8 +40,10 @@ describe('CreateStoreFlow', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: 'Generate store' }));
 
-    await waitFor(() => expect(screen.getByTestId('generated-summary')).toBeInTheDocument());
-    expect(screen.getByText('Maison Oud')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole('group', { name: 'Preview width' })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText('Maison Oud').length).toBeGreaterThan(0);
     expect(useBuilderStore.getState().definition?.meta.name).toBe('Maison Oud');
     expect(useBuilderStore.getState().generation.status).toBe('success');
   });
@@ -62,7 +64,7 @@ describe('CreateStoreFlow', () => {
     await waitFor(() =>
       expect(screen.getByRole('alert')).toHaveTextContent('The AI service is busy right now.'),
     );
-    expect(screen.queryByTestId('generated-summary')).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Preview width' })).not.toBeInTheDocument();
     expect(useBuilderStore.getState().generation.status).toBe('error');
   });
 
@@ -74,7 +76,7 @@ describe('CreateStoreFlow', () => {
     render(<CreateStoreFlow />);
     await userEvent.type(screen.getByLabelText('Describe your store'), 'a tech gadget store');
     await userEvent.click(screen.getByRole('button', { name: 'Generate store' }));
-    await waitFor(() => screen.getByTestId('generated-summary'));
+    await waitFor(() => screen.getByRole('group', { name: 'Preview width' }));
 
     await userEvent.click(screen.getByRole('button', { name: 'Start over' }));
     expect(screen.getByLabelText('Describe your store')).toBeInTheDocument();
