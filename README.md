@@ -9,6 +9,9 @@
 > API: `/health`, `/ready`, `/me`, `POST /generate`, full `/stores` CRUD.
 > Hardened: nonce CSP + security headers on web, Helmet + audit logging + tuned rate limits
 > on the API, real landing page, loading/error boundaries, a11y landmarks, RSC/perf pass.
+> Editor is a full-bleed customizer with **inline text editing** in the live preview; a
+> desert-luxe landing + sign-in; generation runs on prompt `store@v2` with a self-repair
+> retry, Anthropic prompt caching, and an optional `ai_interactions` audit table.
 > Next: **Phase 11 — Testing & Quality Assurance**.
 
 ## Overview
@@ -75,41 +78,105 @@ docs/
   skills/  area-specific rules for Claude Code
 ```
 
-## Local development
+## Setup & run
 
-Prerequisites: Node 22 (`.nvmrc`), pnpm 10, Docker. Nothing else global.
+**Prerequisites** (nothing else global): **Node 22** (`nvm use` reads `.nvmrc`),
+**pnpm 10** (`corepack enable`), **Docker** (for Postgres). A first `pnpm build` also needs
+network once to fetch the web fonts via `next/font`.
+
+### 1. Install
 
 ```bash
-cp apps/api/.env.example apps/api/.env    # set ANTHROPIC_API_KEY (used from Phase 5)
-cp apps/web/.env.example apps/web/.env    # set AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET + a real
-                                         # AUTH_SECRET (`npx auth secret`); keep AUTH_JWT_SECRET
-                                         # identical in both .env files
 pnpm install
-pnpm db:up                                # docker compose: Postgres 16 on host port 5433
-pnpm db:migrate                           # apply Prisma migrations
-pnpm dev                                  # turborepo: web (:3000) + api (:4000)
 ```
 
-- `pnpm dev` / `pnpm build` / `pnpm lint` / `pnpm typecheck` / `pnpm test` — workspace-wide via Turborepo
-- `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` — local Postgres (host port 5433 to avoid clashing with a local 5432)
-- `pnpm db:migrate` — `prisma migrate dev` in `apps/api`
-- `pnpm format` — Prettier
+### 2. Environment files
 
-API check: `curl localhost:4000/health` (liveness) and `curl localhost:4000/ready` (DB reachable).
-Env is per-app (`apps/api/.env` for server/DB/AI, `apps/web/.env` for browser/auth).
+Both apps read their own `.env` (git-ignored). Copy the examples:
 
-## Environment configuration
+```bash
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
+```
 
-Per-app, documented in each `.env.example`.
+Then edit them:
 
-- **`apps/api/.env`** (server-only): `DATABASE_URL`, `AI_PROVIDER` (default `anthropic`),
-  `ANTHROPIC_API_KEY` (+ `OPENAI_API_KEY` / `GEMINI_API_KEY` if switched), `AUTH_JWT_SECRET`,
-  `API_PORT`.
-- **`apps/web/.env`**: `NEXT_PUBLIC_API_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_GOOGLE_ID`,
-  `AUTH_GOOGLE_SECRET`, `AUTH_JWT_SECRET`.
-- `AUTH_JWT_SECRET` (≥16 chars) must be **identical** in both files — it signs/verifies the
-  API JWT. AI keys never appear in `apps/web` or any `NEXT_PUBLIC_` variable.
-- Google OAuth client: authorized redirect URI `http://localhost:3000/api/auth/callback/google`.
+**`apps/api/.env`**
+- `DATABASE_URL` — leave as-is; it matches `docker-compose.yml` (Postgres on host port **5433**).
+- `AI_PROVIDER` — set **`fake`** to run the whole generate flow with **no API key** (returns a
+  themed fixture), or keep `anthropic` and set `ANTHROPIC_API_KEY` for real generation.
+- `AUTH_JWT_SECRET` — any string ≥16 chars. **Must be identical to the one in `apps/web/.env`.**
+- `AI_LOG_INTERACTIONS` — set `true` to record every prompt/response to the `ai_interactions`
+  table (see *Inspecting AI calls* below). Off by default.
+
+**`apps/web/.env`**
+- `AUTH_SECRET` — generate one: `npx auth secret` (or any 32+ char random string).
+- `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — a Google OAuth **Web application** client from
+  [console.cloud.google.com](https://console.cloud.google.com) → *APIs & Services → Credentials*.
+  Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`. Sign-in is the only
+  step that can't be faked — the rest of the app runs without it.
+- `AUTH_JWT_SECRET` — **the same value** as in `apps/api/.env`.
+- `NEXT_PUBLIC_API_URL` — leave as `http://localhost:4000`.
+
+### 3. Database
+
+```bash
+pnpm db:up          # start Postgres 16 in Docker (host port 5433)
+pnpm db:migrate     # apply Prisma migrations + generate the client
+```
+
+### 4. Start
+
+```bash
+pnpm dev            # Turborepo runs both apps: web on :3000, api on :4000
+```
+
+Open **http://localhost:3000**. Check the API with `curl localhost:4000/health` (liveness) and
+`curl localhost:4000/ready` (DB reachable).
+
+### Everyday commands
+
+| Command | What it does |
+|---|---|
+| `pnpm dev` | web (`:3000`) + api (`:4000`) with hot reload |
+| `pnpm build` / `pnpm lint` / `pnpm typecheck` / `pnpm test` | workspace-wide via Turborepo |
+| `pnpm --filter @xandevo/api test:e2e` | API end-to-end (needs `pnpm db:up`) |
+| `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` | local Postgres lifecycle |
+| `pnpm db:migrate` | `prisma migrate dev` in `apps/api` |
+| `pnpm --filter @xandevo/api db:studio` | Prisma Studio — browse the database |
+| `pnpm format` | Prettier |
+
+### Inspecting AI calls
+
+With `AI_LOG_INTERACTIONS=true` in `apps/api/.env`, one row per provider call (each retry
+included) is written to `ai_interactions` with the exact system + user prompt, the raw tool
+output, parse errors, token counts (incl. cache), and cost. Browse it with
+`pnpm --filter @xandevo/api db:studio` (model **AiInteraction**) or any Postgres client on
+`postgresql://xandevo:xandevo@localhost:5433/xandevo`. The API also prints a one-line
+`{"event":"generation",…}` summary per request to stdout regardless.
+
+### Troubleshooting
+
+- **Port 5433 already in use** — another Postgres is on `5432`; this project deliberately maps
+  `5433:5432`. Stop the other one or change the host port in `docker-compose.yml` **and**
+  `DATABASE_URL`.
+- **`pnpm build` fails fetching fonts** — the first web build downloads Google fonts via
+  `next/font`; run it once with network, after that it's cached.
+- **Sign-in redirect error** — the Google client's redirect URI must be exactly
+  `http://localhost:3000/api/auth/callback/google`, and `AUTH_URL` must be `http://localhost:3000`.
+- **API 401 on every call** — `AUTH_JWT_SECRET` differs between the two `.env` files.
+
+## Environment configuration (reference)
+
+Per-app, fully documented in each `.env.example`.
+
+| File | Keys |
+|---|---|
+| `apps/api/.env` (server-only) | `NODE_ENV`, `API_PORT`, `DATABASE_URL`, `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `AI_LOG_INTERACTIONS`, `OPENAI_API_KEY`/`GEMINI_API_KEY` (unused), `AUTH_JWT_SECRET` |
+| `apps/web/.env` | `NEXT_PUBLIC_API_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_JWT_SECRET` |
+
+`AUTH_JWT_SECRET` (≥16 chars) must be **identical** in both files — it signs/verifies the API
+JWT (ADR-005). AI keys never appear in `apps/web` or any `NEXT_PUBLIC_*` variable.
 
 ## Database
 
@@ -146,9 +213,12 @@ Claude Code is the primary engineering assistant. `CLAUDE.md` is the concise sou
 
 Phases 1–10 complete — the MVP loop is end to end: generate → edit → save → reload, with a
 production-readiness pass on top (nonce CSP + security headers, API Helmet + audit logging +
-tuned rate limits + 256 KB body cap, real landing page, loading/error/not-found boundaries,
-a11y landmarks, RSC/memoization/perf audit). API: `/health`, `/ready`, `/me`, `POST /generate`,
-full `/stores` CRUD (normalized transactional persistence). Set `AI_PROVIDER=fake` in
+tuned rate limits + 256 KB body cap, loading/error/not-found boundaries, a11y landmarks,
+RSC/memoization/perf audit). Since then: a full-bleed store customizer with inline text
+editing in the preview, a committed visual world for the public pages (landing + sign-in),
+prompt `store@v2` + schema-repair retry + Anthropic prompt caching, and an opt-in
+`ai_interactions` log table. API: `/health`, `/ready`, `/me`, `POST /generate`, full
+`/stores` CRUD (normalized transactional persistence). Set `AI_PROVIDER=fake` in
 `apps/api/.env` to generate without an Anthropic key. Decisions log:
 `docs/decisions/OPEN-QUESTIONS.md`.
 Next: **Phase 11 — Testing & Quality Assurance**.
