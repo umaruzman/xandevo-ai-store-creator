@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { PRODUCT_BADGES, PRODUCT_IMAGE_KINDS, PRODUCT_IMAGE_STYLES, zEnum } from './enums.js';
 import {
   currencyCode,
-  externalUrl,
+  imageUrl,
   LIMITS,
   optionalText,
   priceMinor,
@@ -21,7 +21,7 @@ export const productImageSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('url'),
-    url: externalUrl,
+    url: imageUrl,
     style: zEnum(PRODUCT_IMAGE_STYLES).optional(),
   }),
 ]);

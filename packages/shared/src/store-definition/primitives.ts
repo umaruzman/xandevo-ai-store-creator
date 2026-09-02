@@ -58,10 +58,26 @@ export const clampedInt = (min: number, max: number): z.ZodNumber =>
 
 export const priceMinor = clampedInt(PRICE_MIN_MINOR, PRICE_MAX_MINOR);
 
-/** An https URL on the allowlisted host set (MVP: none — external URLs are rejected). */
+const isHttpsUrl = (value: string): boolean => {
+  const match = /^https:\/\/([^/?#]+)/i.exec(value);
+  return Boolean(match && (match[1] ?? '').toLowerCase().split(':')[0]);
+};
+
+/**
+ * A link-target URL. Must be a well-formed `https://` URL — no scheme other than
+ * https (blocks `javascript:` / `data:` / `http:`). Host is NOT allowlisted:
+ * storefront links may point anywhere. Text is still tag-stripped by the sanitizer.
+ */
+export const externalUrl = z.string().trim().url().refine(isHttpsUrl, 'must be an https:// URL');
+
+/** Hosts an image `url` may load from. Empty in the MVP — generation uses placeholders. */
 export const ALLOWED_URL_HOSTS: readonly string[] = [];
 
-export const externalUrl = z
+/**
+ * An image URL. Stricter than {@link externalUrl}: host must be allowlisted,
+ * since a `url` image could be a fetch/SSRF vector once an upload pipeline exists.
+ */
+export const imageUrl = z
   .string()
   .trim()
   .url()

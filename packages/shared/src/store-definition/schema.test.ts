@@ -39,6 +39,18 @@ describe('storeDefinitionInputSchema', () => {
     expect(storeDefinitionInputSchema.safeParse(input).success).toBe(false);
   });
 
+  it('accepts an external link target to any https host but rejects other schemes', () => {
+    const withLink = (url: string) => {
+      const input = validStoreDefinitionInput();
+      input.navigation.links[0]!.target = { type: 'external', url } as never;
+      return storeDefinitionInputSchema.safeParse(input).success;
+    };
+    expect(withLink('https://instagram.com/maisonoud')).toBe(true);
+    expect(withLink('https://anything.example/path?x=1')).toBe(true);
+    expect(withLink('http://instagram.com/maisonoud')).toBe(false);
+    expect(withLink('javascript:alert(1)')).toBe(false);
+  });
+
   it('rejects fewer than three products', () => {
     const input = validStoreDefinitionInput();
     input.products = input.products.slice(0, 2);

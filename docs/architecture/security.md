@@ -46,7 +46,7 @@ validated.
 | Malicious/unsafe generated content | Full pipeline: Zod schema → business validation → sanitization (strip tags/scripts/control chars) → normalization. |
 | Script/HTML injection (XSS) | Renderer renders text as text only. No `dangerouslySetInnerHTML` on any generated field. Constrained markdown subset (if any) rendered via a safe allowlist renderer. |
 | Arbitrary code execution | AI never emits code; no `eval`, no `new Function`, no dynamic import of generated strings, no runtime component compilation. |
-| Malicious URLs (`javascript:`, `data:`, tracking) | All url-bearing fields rejected unless host is on an allowlist; targets are structured, not raw hrefs. |
+| Malicious URLs (`javascript:`, `data:`, tracking) | Link targets are structured (`{ type, ... }`), never raw hrefs. `external` targets must be a well-formed `https://` URL — any host, but no other scheme. Image `url` (unused by generation) stays host-allowlisted (SSRF). |
 | Oversized content / cost abuse | Length caps per field; token budget per request; rate limiting. |
 | SSRF via image URLs | MVP uses placeholder images only; `url` image kind disabled until an upload pipeline with host allowlist + fetch proxy exists. |
 
@@ -121,7 +121,7 @@ Mirrored in `.github/PULL_REQUEST_TEMPLATE.md`.
       (404, not 403) and the service re-checks.
 - [ ] No generated / user content rendered as HTML (`dangerouslySetInnerHTML`, `eval`).
 - [ ] No secret in `NEXT_PUBLIC_*`, client bundles, API responses, or logs. New URL fields
-      are host-allowlisted or structured link targets — never raw hrefs.
+      are `https://`-only structured link targets (image `url` host-allowlisted) — never raw hrefs.
 - [ ] Rate limit (`@Throttle`) set for a new mutating / expensive route; body-size fits the
       256 KB limit.
 - [ ] New browser → server call goes through a Server Action or a same-origin BFF route
