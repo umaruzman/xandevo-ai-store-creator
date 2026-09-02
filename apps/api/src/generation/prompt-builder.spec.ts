@@ -8,7 +8,7 @@ describe('PromptBuilder', () => {
       DEFAULT_PROMPT_VERSION,
       'a luxury perfume store',
     );
-    expect(promptVersion).toBe('store@v1');
+    expect(promptVersion).toBe('store@v2');
     expect(system).toContain('emit_store_definition');
     expect(system).toContain('"productGrid"'); // from the embedded JSON schema / enum list
     expect(system).toContain('luxury —');

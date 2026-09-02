@@ -86,7 +86,7 @@ describe('POST /generate (e2e)', () => {
       .send({ prompt: 'a luxury perfume store for UAE customers' })
       .expect(200);
 
-    expect(res.body.promptVersion).toBe('store@v1');
+    expect(res.body.promptVersion).toBe('store@v2');
     expect(res.body.usage).toEqual({ inputTokens: 111, outputTokens: 222 });
     expect(res.body.definition.schemaVersion).toBe(1);
     expect(res.body.definition.pages).toHaveLength(3);

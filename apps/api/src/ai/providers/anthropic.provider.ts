@@ -42,6 +42,29 @@ export class AnthropicProvider implements AiProvider {
     if (args.signal)
       args.signal.addEventListener('abort', () => controller.abort(), { once: true });
 
+    const messages: Anthropic.MessageParam[] = [{ role: 'user', content: args.user }];
+    if (args.repair) {
+      messages.push({
+        role: 'assistant',
+        content: [
+          { type: 'tool_use', id: 'repair_0', name: TOOL_NAME, input: args.repair.priorOutput },
+        ],
+      });
+      messages.push({
+        role: 'user',
+        content: [
+          {
+            type: 'tool_result',
+            tool_use_id: 'repair_0',
+            is_error: true,
+            content:
+              `That output failed validation:\n- ${args.repair.issues.join('\n- ')}\n\n` +
+              `Call ${TOOL_NAME} again with a fully corrected value. Fix only what the errors name; keep everything else.`,
+          },
+        ],
+      });
+    }
+
     let response: Anthropic.Message;
     try {
       response = await this.client.messages.create(
@@ -49,7 +72,7 @@ export class AnthropicProvider implements AiProvider {
           model: this.model,
           max_tokens: 8000,
           system: args.system,
-          messages: [{ role: 'user', content: args.user }],
+          messages,
           tools: [
             {
               name: TOOL_NAME,
@@ -77,19 +100,35 @@ export class AnthropicProvider implements AiProvider {
     const raw = JSON.stringify(toolUse.input);
     const parsed = args.schema.safeParse(toolUse.input);
     if (!parsed.success) {
-      this.logger.debug(`schema parse failed: ${parsed.error.message}`);
-      throw new AiProviderError('model output failed schema validation', true, parsed.error);
+      const issues = parsed.error.issues.map(
+        (i) => `${i.path.join('.') || '(root)'}: ${i.message}`,
+      );
+      this.logger.debug(`schema parse failed: ${issues.slice(0, 5).join('; ')}`);
+      throw new AiProviderError('model output failed schema validation', true, parsed.error, {
+        rawOutput: toolUse.input,
+        issues,
+      });
     }
 
+    const usage = response.usage as typeof response.usage & {
+      cache_read_input_tokens?: number | null;
+      cache_creation_input_tokens?: number | null;
+    };
     return {
       data: parsed.data,
       usage: {
-        inputTokens: response.usage.input_tokens,
-        outputTokens: response.usage.output_tokens,
+        inputTokens: usage.input_tokens,
+        outputTokens: usage.output_tokens,
+        cacheReadTokens: usage.cache_read_input_tokens ?? undefined,
+        cacheWriteTokens: usage.cache_creation_input_tokens ?? undefined,
       },
       raw,
       model: this.model,
-      providerMeta: { stopReason: response.stop_reason, id: response.id },
+      providerMeta: {
+        stopReason: response.stop_reason,
+        id: response.id,
+        repaired: Boolean(args.repair),
+      },
     };
   }
 

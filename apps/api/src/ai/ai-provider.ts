@@ -8,6 +8,9 @@ export type AiProviderName = 'anthropic' | 'openai' | 'gemini' | 'fake';
 export interface TokenUsage {
   inputTokens: number;
   outputTokens: number;
+  /** Set by providers that support prompt caching. */
+  cacheReadTokens?: number;
+  cacheWriteTokens?: number;
 }
 
 export interface AiResult<T> {
@@ -27,6 +30,12 @@ export interface GenerateStructuredArgs<T> {
   timeoutMs: number;
   promptVersion: string;
   signal?: AbortSignal;
+  /**
+   * Present on a retry: the previous invalid tool output and the exact
+   * validation errors. The impl replays it as a tool_result so the model
+   * corrects its own output instead of regenerating blind.
+   */
+  repair?: { priorOutput: unknown; issues: string[] };
 }
 
 /**
@@ -44,6 +53,8 @@ export class AiProviderError extends Error {
     message: string,
     readonly retryable: boolean,
     override readonly cause?: unknown,
+    /** Set on a schema-validation failure so the service can build a repair turn. */
+    readonly details?: { rawOutput?: unknown; issues?: string[] },
   ) {
     super(message);
     this.name = 'AiProviderError';

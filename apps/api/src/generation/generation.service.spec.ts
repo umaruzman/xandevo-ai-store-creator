@@ -48,7 +48,7 @@ describe('GenerationService', () => {
     expect(res.definition.pages).toHaveLength(3);
     expect(res.definition.pages[0]!.sections[0]!.id).toMatch(/-/); // ids assigned by normalize
     expect(res.usage).toEqual({ inputTokens: 100, outputTokens: 200 });
-    expect(res.promptVersion).toBe('store@v1');
+    expect(res.promptVersion).toBe('store@v2');
   });
 
   it('retries a retryable provider error and then succeeds', async () => {
@@ -91,6 +91,33 @@ describe('GenerationService', () => {
     await expect(run(provider)).rejects.toMatchObject({
       reason: 'invalid_output',
       failureStage: 'business',
+    });
+  });
+
+  it('feeds the invalid output + errors back as a repair turn, then succeeds', async () => {
+    const seen: Array<GenerateStructuredArgs<unknown>['repair']> = [];
+    const badOutput = { meta: { name: 'x' } };
+    const provider: AiProvider = {
+      name: 'fake',
+      generateStructured: <T>(args: GenerateStructuredArgs<T>): Promise<AiResult<T>> => {
+        seen.push(args.repair);
+        if (seen.length === 1) {
+          return Promise.reject(
+            new AiProviderError('schema', true, undefined, {
+              rawOutput: badOutput,
+              issues: ['meta.currency: Required', 'theme: Required'],
+            }),
+          );
+        }
+        return Promise.resolve(ok(validStoreDefinitionInput()) as AiResult<T>);
+      },
+    };
+    const res = await run(provider);
+    expect(res.definition.pages).toHaveLength(3);
+    expect(seen[0]).toBeUndefined(); // first attempt: no repair
+    expect(seen[1]).toEqual({
+      priorOutput: badOutput,
+      issues: ['meta.currency: Required', 'theme: Required'],
     });
   });
 

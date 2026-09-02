@@ -59,11 +59,18 @@ What exists now:
   gates `/dashboard/*` + `/stores/*`. TanStack Query is Phase 9.
 - **AI generation (Phase 5):** `AiModule` (`AiProvider` interface + `AI_PROVIDER` token,
   factory on `AI_PROVIDER` env); providers under `src/ai/providers/` only —
-  `AnthropicProvider` (default, `emit_store_definition` tool) + `FakeAiProvider`
-  (`AI_PROVIDER=fake`). `GenerationModule`: versioned prompt TS module
-  `generation/prompts/store/v1.ts`, `PromptBuilder`, `GenerationService` (retry ×3 +
-  backoff, 60 s timeout, runs `buildStoreDefinition`, JSON logs + cost estimate). **`POST
-  /generate`** (auth, `@HttpCode(200)`, 10/min/user) → `{ definition, promptVersion, usage }`.
+  `AnthropicProvider` (default, `emit_store_definition` forced tool) + `FakeAiProvider`
+  (`AI_PROVIDER=fake`). `GenerationModule`: versioned prompt TS modules
+  `generation/prompts/store/v1.ts` + `v2.ts` (default `store@v2` — carries a valid
+  worked example + sharpened cross-reference rules so the first tool call usually
+  validates), `PromptBuilder`, `GenerationService` (≤3 attempts + backoff, 60 s timeout,
+  runs `buildStoreDefinition`). On a schema-validation failure the service replays the
+  invalid output + Zod issues as a `tool_result` **repair turn** (`GenerateStructuredArgs.repair`)
+  so the model corrects itself instead of regenerating blind. `AiInteractionLogger` →
+  `ai_interactions` table (one row per provider call: exact system+user prompt, raw tool
+  output, parseOk, tokens incl. cache, cost) when `AI_LOG_INTERACTIONS=true` (off by
+  default — holds full prompt text). **`POST /generate`** (auth, `@HttpCode(200)`,
+  10/min/user) → `{ definition, promptVersion, usage }`.
   Global `ValidationPipe`, `AllExceptionsFilter` (standard `{ error: {...} }` envelope),
   `RequestIdMiddleware`, per-user `ThrottlerGuard`.
 - **Auth (Phase 4):** `@xandevo/shared/auth` (API JWT contract); `apps/web` Auth.js

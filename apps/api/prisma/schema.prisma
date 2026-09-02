@@ -59,6 +59,37 @@ model User {
   @@map("users")
 }
 
+/// One row per AI provider call made during generation (each retry included).
+/// Stores the exact system + user prompt sent and the raw tool output received,
+/// for cost/debug inspection. Written only when AI_LOG_INTERACTIONS=true —
+/// it holds full prompt text, so keep it off where prompts may carry PII.
+model AiInteraction {
+  id               String   @id @default(uuid()) @db.Uuid
+  requestId        String
+  userId           String   @db.Uuid
+  promptVersion    String
+  provider         String
+  model            String?
+  attempt          Int
+  repaired         Boolean  @default(false)
+  parseOk          Boolean
+  systemPrompt     String
+  userPrompt       String
+  responseRaw      String?
+  parseErrors      Json?
+  inputTokens      Int?
+  outputTokens     Int?
+  cacheReadTokens  Int?
+  cacheWriteTokens Int?
+  latencyMs        Int?
+  costUsd          Float?
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([requestId])
+  @@map("ai_interactions")
+}
+
 // ──────────────────────────────── Store ───────────────────────────────────
 model Store {
   id              String      @id @default(uuid()) @db.Uuid

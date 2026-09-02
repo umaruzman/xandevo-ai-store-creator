@@ -101,6 +101,10 @@ validated.
 - Never log: JWTs, secrets, full AI prompts/outputs (debug only, redacted), email in plain
   info logs (use `userId`).
 - Error responses to clients: generic message + `requestId`; stack traces server-side only.
+- `ai_interactions` (opt-in `AI_LOG_INTERACTIONS=true`) stores full system + user prompts and
+  raw model output for cost/debug review. Keep it **off** in any environment where prompts may
+  carry personal data; it is dev/debug tooling, not a production default. No JWTs or secrets are
+  written (the prompt is a sanitized business description; the system prompt is static).
 
 ## 10. Dependency & supply chain
 

@@ -3,6 +3,7 @@ import { storeDefinitionInputSchema } from '@xandevo/shared';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
 import * as v1 from './prompts/store/v1';
+import * as v2 from './prompts/store/v2';
 
 export interface BuiltPrompt {
   system: string;
@@ -12,9 +13,10 @@ export interface BuiltPrompt {
 
 const VERSIONS = {
   [v1.PROMPT_VERSION]: v1,
+  [v2.PROMPT_VERSION]: v2,
 } as const;
 
-export const DEFAULT_PROMPT_VERSION = v1.PROMPT_VERSION;
+export const DEFAULT_PROMPT_VERSION = v2.PROMPT_VERSION;
 
 @Injectable()
 export class PromptBuilder {
