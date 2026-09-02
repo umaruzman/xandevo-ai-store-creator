@@ -16,15 +16,7 @@ type Device = 'desktop' | 'mobile';
  * Save / Start over) over a full-height storefront render. Navigation between
  * pages happens by clicking the storefront's own nav links — no separate tabs.
  */
-export function StorePreview({
-  onStartOver,
-  sidebarOpen = true,
-  onOpenSidebar,
-}: {
-  onStartOver: () => void;
-  sidebarOpen?: boolean;
-  onOpenSidebar?: () => void;
-}) {
+export function StorePreview({ onStartOver }: { onStartOver: () => void }) {
   const definition = useBuilderStore((s) => s.definition);
   const storeId = useBuilderStore((s) => s.storeId);
   const promptText = useBuilderStore((s) => s.promptText);
@@ -116,12 +108,6 @@ export function StorePreview({
   return (
     <div className="flex min-w-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center gap-3 border-b px-4 py-2.5">
-        {!sidebarOpen && onOpenSidebar ? (
-          <Button variant="outline" size="sm" onClick={onOpenSidebar}>
-            Customize
-          </Button>
-        ) : null}
-
         <div className="mr-auto min-w-0">
           <p className="flex items-center gap-2 truncate text-sm font-medium">
             {definition.meta.name}

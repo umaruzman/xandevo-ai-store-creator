@@ -14,7 +14,17 @@ interface PromptFormProps {
 
 export function PromptForm({ formAction, isPending, error, onSubmitStart }: PromptFormProps) {
   return (
-    <form action={formAction} onSubmit={onSubmitStart} className="space-y-4">
+    <form
+      action={formAction}
+      onSubmit={onSubmitStart}
+      className="mx-auto max-w-2xl space-y-4 p-6 pt-10"
+    >
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Create a store</h1>
+        <p className="text-muted-foreground text-sm">
+          Describe what you want and Xandevo generates a complete storefront.
+        </p>
+      </div>
       <div className="space-y-2">
         <label htmlFor="prompt" className="text-sm font-medium">
           Describe your store
