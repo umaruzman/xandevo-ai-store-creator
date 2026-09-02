@@ -173,6 +173,7 @@ docs/           architecture, decisions (ADRs), api, database, ai, development
 | Testing | `.claude/skills/testing/SKILL.md` |
 | Decisions & rationale | `docs/decisions/` |
 | Phases & gates | `docs/development/roadmap.md` |
+| Local setup / run | `docs/development/setup.md` |
 | Git / workflow | `docs/development/development-workflow.md` |
 
 ## Decisions

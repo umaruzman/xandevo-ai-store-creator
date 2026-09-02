@@ -80,103 +80,25 @@ docs/
 
 ## Setup & run
 
-**Prerequisites** (nothing else global): **Node 22** (`nvm use` reads `.nvmrc`),
-**pnpm 10** (`corepack enable`), **Docker** (for Postgres). A first `pnpm build` also needs
-network once to fetch the web fonts via `next/font`.
-
-### 1. Install
+Full walkthrough: **[`docs/development/setup.md`](docs/development/setup.md)**. The short version:
 
 ```bash
 pnpm install
+cp apps/api/.env.example apps/api/.env    # set ANTHROPIC_API_KEY + AUTH_JWT_SECRET
+cp apps/web/.env.example apps/web/.env    # set AUTH_SECRET, AUTH_GOOGLE_ID/SECRET,
+                                         # and the SAME AUTH_JWT_SECRET
+pnpm db:up && pnpm db:migrate             # PostgreSQL 16 in Docker (host port 5433)
+pnpm dev                                  # web :3000, api :4000
 ```
 
-### 2. Environment files
+Then open http://localhost:3000. Generation runs on **Anthropic Claude** — currently the only
+provider implemented; get a key at [console.anthropic.com](https://console.anthropic.com).
+Google sign-in needs an OAuth client (redirect URI
+`http://localhost:3000/api/auth/callback/google`) — see the setup guide.
 
-Both apps read their own `.env` (git-ignored). Copy the examples:
-
-```bash
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
-```
-
-Then edit them:
-
-**`apps/api/.env`**
-- `DATABASE_URL` — leave as-is; it matches `docker-compose.yml` (Postgres on host port **5433**).
-- `AI_PROVIDER` — set **`fake`** to run the whole generate flow with **no API key** (returns a
-  themed fixture), or keep `anthropic` and set `ANTHROPIC_API_KEY` for real generation.
-- `AUTH_JWT_SECRET` — any string ≥16 chars. **Must be identical to the one in `apps/web/.env`.**
-- `AI_LOG_INTERACTIONS` — set `true` to record every prompt/response to the `ai_interactions`
-  table (see *Inspecting AI calls* below). Off by default.
-
-**`apps/web/.env`**
-- `AUTH_SECRET` — generate one: `npx auth secret` (or any 32+ char random string).
-- `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — a Google OAuth **Web application** client from
-  [console.cloud.google.com](https://console.cloud.google.com) → *APIs & Services → Credentials*.
-  Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`. Sign-in is the only
-  step that can't be faked — the rest of the app runs without it.
-- `AUTH_JWT_SECRET` — **the same value** as in `apps/api/.env`.
-- `NEXT_PUBLIC_API_URL` — leave as `http://localhost:4000`.
-
-### 3. Database
-
-```bash
-pnpm db:up          # start Postgres 16 in Docker (host port 5433)
-pnpm db:migrate     # apply Prisma migrations + generate the client
-```
-
-### 4. Start
-
-```bash
-pnpm dev            # Turborepo runs both apps: web on :3000, api on :4000
-```
-
-Open **http://localhost:3000**. Check the API with `curl localhost:4000/health` (liveness) and
-`curl localhost:4000/ready` (DB reachable).
-
-### Everyday commands
-
-| Command | What it does |
-|---|---|
-| `pnpm dev` | web (`:3000`) + api (`:4000`) with hot reload |
-| `pnpm build` / `pnpm lint` / `pnpm typecheck` / `pnpm test` | workspace-wide via Turborepo |
-| `pnpm --filter @xandevo/api test:e2e` | API end-to-end (needs `pnpm db:up`) |
-| `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` | local Postgres lifecycle |
-| `pnpm db:migrate` | `prisma migrate dev` in `apps/api` |
-| `pnpm --filter @xandevo/api db:studio` | Prisma Studio — browse the database |
-| `pnpm format` | Prettier |
-
-### Inspecting AI calls
-
-With `AI_LOG_INTERACTIONS=true` in `apps/api/.env`, one row per provider call (each retry
-included) is written to `ai_interactions` with the exact system + user prompt, the raw tool
-output, parse errors, token counts (incl. cache), and cost. Browse it with
-`pnpm --filter @xandevo/api db:studio` (model **AiInteraction**) or any Postgres client on
-`postgresql://xandevo:xandevo@localhost:5433/xandevo`. The API also prints a one-line
-`{"event":"generation",…}` summary per request to stdout regardless.
-
-### Troubleshooting
-
-- **Port 5433 already in use** — another Postgres is on `5432`; this project deliberately maps
-  `5433:5432`. Stop the other one or change the host port in `docker-compose.yml` **and**
-  `DATABASE_URL`.
-- **`pnpm build` fails fetching fonts** — the first web build downloads Google fonts via
-  `next/font`; run it once with network, after that it's cached.
-- **Sign-in redirect error** — the Google client's redirect URI must be exactly
-  `http://localhost:3000/api/auth/callback/google`, and `AUTH_URL` must be `http://localhost:3000`.
-- **API 401 on every call** — `AUTH_JWT_SECRET` differs between the two `.env` files.
-
-## Environment configuration (reference)
-
-Per-app, fully documented in each `.env.example`.
-
-| File | Keys |
-|---|---|
-| `apps/api/.env` (server-only) | `NODE_ENV`, `API_PORT`, `DATABASE_URL`, `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `AI_LOG_INTERACTIONS`, `OPENAI_API_KEY`/`GEMINI_API_KEY` (unused), `AUTH_JWT_SECRET` |
-| `apps/web/.env` | `NEXT_PUBLIC_API_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_JWT_SECRET` |
-
-`AUTH_JWT_SECRET` (≥16 chars) must be **identical** in both files — it signs/verifies the API
-JWT (ADR-005). AI keys never appear in `apps/web` or any `NEXT_PUBLIC_*` variable.
+Every key is documented in each `.env.example`. `AUTH_JWT_SECRET` (≥16 chars) must be
+**identical** in both files — it signs/verifies the API JWT (ADR-005). AI keys never appear in
+`apps/web` or any `NEXT_PUBLIC_*` variable.
 
 ## Database
 
@@ -218,9 +140,8 @@ RSC/memoization/perf audit). Since then: a full-bleed store customizer with inli
 editing in the preview, a committed visual world for the public pages (landing + sign-in),
 prompt `store@v2` + schema-repair retry + Anthropic prompt caching, and an opt-in
 `ai_interactions` log table. API: `/health`, `/ready`, `/me`, `POST /generate`, full
-`/stores` CRUD (normalized transactional persistence). Set `AI_PROVIDER=fake` in
-`apps/api/.env` to generate without an Anthropic key. Decisions log:
-`docs/decisions/OPEN-QUESTIONS.md`.
+`/stores` CRUD (normalized transactional persistence). Generation runs on Anthropic Claude
+(the only provider implemented). Decisions log: `docs/decisions/OPEN-QUESTIONS.md`.
 Next: **Phase 11 — Testing & Quality Assurance**.
 
 ## Future roadmap
