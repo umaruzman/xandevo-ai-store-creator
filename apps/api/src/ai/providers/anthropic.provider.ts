@@ -71,7 +71,13 @@ export class AnthropicProvider implements AiProvider {
         {
           model: this.model,
           max_tokens: 8000,
-          system: args.system,
+          // Cache the static prefix (tools + system schema + worked example);
+          // only the user message and any repair turn vary between calls.
+          // `cache_control` is valid at runtime — the pinned SDK 0.32 types
+          // predate GA prompt caching, hence the cast.
+          system: [
+            { type: 'text', text: args.system, cache_control: { type: 'ephemeral' } },
+          ] as unknown as Anthropic.MessageCreateParamsNonStreaming['system'],
           messages,
           tools: [
             {

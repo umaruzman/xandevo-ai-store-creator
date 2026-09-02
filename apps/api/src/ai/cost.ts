@@ -10,8 +10,18 @@ const RATES: Record<string, { input: number; output: number }> = {
 
 const FALLBACK = { input: 3, output: 15 };
 
+// Prompt-cache multipliers on the input rate (Anthropic): a read is 0.1x, a
+// one-time write is 1.25x. `usage.inputTokens` already excludes cached tokens.
+const CACHE_READ_MULT = 0.1;
+const CACHE_WRITE_MULT = 1.25;
+
 export function estimateCostUsd(model: string, usage: TokenUsage): number {
   const rate = RATES[model] ?? FALLBACK;
-  const usd = (usage.inputTokens * rate.input + usage.outputTokens * rate.output) / 1_000_000;
+  const usd =
+    (usage.inputTokens * rate.input +
+      (usage.cacheReadTokens ?? 0) * rate.input * CACHE_READ_MULT +
+      (usage.cacheWriteTokens ?? 0) * rate.input * CACHE_WRITE_MULT +
+      usage.outputTokens * rate.output) /
+    1_000_000;
   return Math.round(usd * 1e6) / 1e6;
 }

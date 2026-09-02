@@ -41,6 +41,10 @@ describe('AnthropicProvider', () => {
     expect(create).toHaveBeenCalledTimes(1);
     const [body] = create.mock.calls[0] as [Record<string, unknown>];
     expect(body.tool_choice).toEqual({ type: 'tool', name: 'emit_store_definition' });
+    // the static prefix is marked for prompt caching
+    expect(body.system).toEqual([
+      { type: 'text', text: 's', cache_control: { type: 'ephemeral' } },
+    ]);
   });
 
   it('is retryable when the model returns no tool call', async () => {

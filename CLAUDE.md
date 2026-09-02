@@ -69,7 +69,10 @@ What exists now:
   so the model corrects itself instead of regenerating blind. `AiInteractionLogger` →
   `ai_interactions` table (one row per provider call: exact system+user prompt, raw tool
   output, parseOk, tokens incl. cache, cost) when `AI_LOG_INTERACTIONS=true` (off by
-  default — holds full prompt text). **`POST /generate`** (auth, `@HttpCode(200)`,
+  default — holds full prompt text). Anthropic **prompt caching** on the static prefix
+  (`cache_control: ephemeral` on the system block — schema + worked example); `cost.ts`
+  prices cache read 0.1× / write 1.25×, and read/write token counts land in
+  `ai_interactions`. **`POST /generate`** (auth, `@HttpCode(200)`,
   10/min/user) → `{ definition, promptVersion, usage }`.
   Global `ValidationPipe`, `AllExceptionsFilter` (standard `{ error: {...} }` envelope),
   `RequestIdMiddleware`, per-user `ThrottlerGuard`.
